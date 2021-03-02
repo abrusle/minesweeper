@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rowCount: 8
   columnCount: 8
-  mineCount: 4
+  mineCount: 6

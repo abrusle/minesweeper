@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Minesweeper.Runtime
 {
@@ -7,11 +9,10 @@ namespace Minesweeper.Runtime
         public static int[,] GenerateNewLevel(int rowCount, int colCount, int mineCount)
         {
             var cells = new int[rowCount, colCount];
-
-            for (int i = 0; i < mineCount; i++)
+            var mines = GenerateRandomPoints(mineCount, 0, rowCount - 1, 0, colCount - 1);
+            
+            foreach (Vector2Int pos in mines)
             {
-                var pos = RandomPoint(0, rowCount - 1, 0, colCount - 1);
-
                 // place mine
                 cells[pos.x, pos.y] = int.MinValue;
 
@@ -41,28 +42,39 @@ namespace Minesweeper.Runtime
 
                 if (pos.y > 0)
                     cells[pos.x, pos.y - 1]++;
-                
-                /*  TODO Fix double count
-                0, 0, 3, M, 3, 0, 0, 0, 
-                0, 0, 3, M, 3, 0, 0, 0, 
-                0, 0, 1, 1, 1, 0, 0, 0, 
-                0, 0, 0, 0, 0, 0, 0, 0, 
-                0, 0, 0, 0, 0, 0, 0, 0, 
-                1, 1, 0, 0, 0, 0, 0, 0, 
-                M, 1, 0, 0, 0, 0, 0, 0, 
-                1, 1, 0, 0, 0, 0, 0, 0, */
             }
 
             return cells;
         }
 
-        private static Vector2Int RandomPoint(int minX, int maxX, int minY, int maxY)
+        private static Vector2Int[] GenerateRandomPoints(int count, int xMin, int xMax, int yMin, int yMax)
+        {
+            if (xMax - xMin < count || yMax - yMin < count)
+                throw new InvalidRangeException();
+            
+            var points = new Vector2Int[count];
+            for (int i = 0; i < count; i++)
+            {
+                var pt = RandomPoint(xMin, xMax, yMin, yMax);
+                if (Array.IndexOf(points, pt) != -1) i--;
+                else points[i] = pt;
+            }
+
+            return points;
+        }
+
+        private static Vector2Int RandomPoint(int xMin, int xMax, int yMin, int yMax)
         {
             return new Vector2Int
             {
-                x = Random.Range(minX, maxX),
-                y = Random.Range(minY, maxY)
+                x = Random.Range(xMin, xMax),
+                y = Random.Range(yMin, yMax)
             };
+        }
+        
+        private class InvalidRangeException : System.Exception
+        {
+            
         }
     }
 }

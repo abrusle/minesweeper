@@ -12,8 +12,23 @@ namespace Minesweeper.Runtime
         
         private void Awake()
         {
-            var level = LevelGenerator.GenerateNewLevel(levelSettings.rowCount, levelSettings.columnCount, levelSettings.mineCount);
-            levelGridView.DrawLevel(level);
+            GenerateLevel();
+        }
+
+        private void GenerateLevel()
+        {
+            levelGridView.DrawLevel(LevelGenerator.GenerateNewLevel(
+                levelSettings.rowCount,
+                levelSettings.columnCount,
+                levelSettings.mineCount));
+        }
+
+        private void OnGUI()
+        {
+            if (GUILayout.Button("Regenerate"))
+            {
+                GenerateLevel();
+            }
         }
     }
 }
