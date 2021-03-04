@@ -6,42 +6,43 @@ namespace Minesweeper.Runtime
 {
     public static class LevelGenerator
     {
-        public static int[,] GenerateNewLevel(int rowCount, int colCount, int mineCount)
+        public static Cell[,] GenerateNewLevel(int rowCount, int colCount, int mineCount)
         {
-            var cells = new int[rowCount, colCount];
+            var cells = new Cell[rowCount, colCount];
             var mines = GenerateRandomPoints(mineCount, 0, rowCount - 1, 0, colCount - 1);
             
             foreach (Vector2Int pos in mines)
             {
                 // place mine
-                cells[pos.x, pos.y] = int.MinValue;
+                cells[pos.x, pos.y].value = int.MinValue;
+                cells[pos.x, pos.y].hasMine = true;
 
                 // indicate neighbors
                 if (pos.x < rowCount - 1)
                 {
-                    cells[pos.x + 1, pos.y]++;
+                    cells[pos.x + 1, pos.y].value++;
 
                     if (pos.y < colCount - 1)
-                        cells[pos.x + 1, pos.y + 1]++;
+                        cells[pos.x + 1, pos.y + 1].value++;
                     if (pos.y > 0)
-                        cells[pos.x + 1, pos.y - 1]++;
+                        cells[pos.x + 1, pos.y - 1].value++;
                 }
 
                 if (pos.y < colCount - 1)
-                    cells[pos.x, pos.y + 1]++;
+                    cells[pos.x, pos.y + 1].value++;
 
                 if (pos.x > 0)
                 {
-                    cells[pos.x - 1, pos.y]++;
+                    cells[pos.x - 1, pos.y].value++;
 
                     if (pos.y > 0)
-                        cells[pos.x - 1, pos.y - 1]++;
+                        cells[pos.x - 1, pos.y - 1].value++;
                     if (pos.y < colCount - 1)
-                        cells[pos.x - 1, pos.y + 1]++;
+                        cells[pos.x - 1, pos.y + 1].value++;
                 }
 
                 if (pos.y > 0)
-                    cells[pos.x, pos.y - 1]++;
+                    cells[pos.x, pos.y - 1].value++;
             }
 
             return cells;
@@ -49,7 +50,7 @@ namespace Minesweeper.Runtime
 
         private static Vector2Int[] GenerateRandomPoints(int count, int xMin, int xMax, int yMin, int yMax)
         {
-            if (xMax - xMin < count || yMax - yMin < count)
+            if (count > (xMax - xMin) * (yMax - yMin))
                 throw new InvalidRangeException();
             
             var points = new Vector2Int[count];

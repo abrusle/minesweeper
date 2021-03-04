@@ -1,27 +1,33 @@
-﻿using System;
-using System.Text;
-using Minesweeper.Runtime.Data;
+﻿using System.Text;
 using UnityEngine;
-using TMPro;
-
 namespace Minesweeper.Runtime.Views
 {
+    using Data;
+    
     [RequireComponent(typeof(Grid))]
     public class LevelGridView : MonoBehaviour
     {
+        public Grid Grid => _grid;
+
         [SerializeField]
-        private TextMeshPro tilePrefab;
+        private CellView cellViewPrefab;
 
         [SerializeField] private CellColorSheet colorSheet;
 
         private Grid _grid;
+        private CellView[,] _cellViews;
 
         private void Awake()
         {
             _grid = GetComponent<Grid>();
         }
 
-        public void DrawLevel(int[,] level)
+        public void RevealCell(int x, int y)
+        {
+            _cellViews[x, y].Reveal();
+        }
+
+        public void DrawLevel(Cell[,] level)
         {
             foreach (Transform cell in _grid.transform)
             {
@@ -36,19 +42,23 @@ namespace Minesweeper.Runtime.Views
 
             int xMax = level.GetLength(0);
             int yMax = level.GetLength(1);
+
+            _cellViews = new CellView[xMax, yMax];
+            
             for (int x = 0; x < xMax; x++)
             {
                 for (int y = 0; y < yMax; y++)
                 {
-                    int val = level[x, y];
-                    string cellText = val < 0 ? "M" : val.ToString();
+                    var cell = level[x, y];
+                    string cellText = cell.hasMine ? "M" : cell.value.ToString();
 
-                    var cellView = Instantiate(tilePrefab, root);
+                    var cellView = Instantiate(cellViewPrefab, root);
+                    cellView.name = $"Cell [{x};{y}]";
                     cellView.transform.localPosition = _grid.GetCellCenterLocal(new Vector3Int(x, y, 0));
-                    cellView.text = cellText;
-                    if (cellText != "M")
-                        cellView.color = colorSheet.GetColor(val);
-
+                    cellView.Load(x, y, cellText);
+                    if (!cell.hasMine)
+                        cellView.TextColor = colorSheet.GetColor(cell.value);
+                    _cellViews[x, y] = cellView;
 
                     log.Append(cellText).Append(", ");
                 }

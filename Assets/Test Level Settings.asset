@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fad9e739ff7404fbafbfeae4b0adee1, type: 3}
   m_Name: Test Level Settings
   m_EditorClassIdentifier: 
-  rowCount: 8
-  columnCount: 8
-  mineCount: 6
+  rowCount: 14
+  columnCount: 9
+  mineCount: 19
