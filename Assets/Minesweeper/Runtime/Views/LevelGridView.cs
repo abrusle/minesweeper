@@ -22,53 +22,48 @@ namespace Minesweeper.Runtime.Views
             _grid = GetComponent<Grid>();
         }
 
-        public void RevealCell(int x, int y)
+        public void RevealCell(Cell cell, int x, int y)
         {
-            _cellViews[x, y].Reveal();
+            var cellView = _cellViews[x, y];
+            cellView.Text = cell.hasMine ? "M" : cell.value.ToString();
+            if (!cell.hasMine)
+                cellView.TextColor = colorSheet.GetColor(cell.value);
+            cellView.Reveal();
         }
 
-        public void DrawLevel(Cell[,] level)
+        public void Clear()
         {
-            foreach (Transform cell in _grid.transform)
+            foreach (Transform level in _grid.transform)
             {
-                Destroy(cell.gameObject);
+                Destroy(level.gameObject);
             }
 
-            var root = new GameObject("Level").transform;
+            _cellViews = null;
+        }
+
+        public void DrawLevelGrid(int xMax, int yMax)
+        {
+            Clear();
+
+            var root = new GameObject($"Level ({xMax} x {yMax})").transform;
             root.SetParent(_grid.transform);
             root.localPosition = Vector3.zero;
             
-            var log = new StringBuilder("Generated Level:\n");
-
-            int xMax = level.GetLength(0);
-            int yMax = level.GetLength(1);
-
             _cellViews = new CellView[xMax, yMax];
             
             for (int x = 0; x < xMax; x++)
             {
                 for (int y = 0; y < yMax; y++)
                 {
-                    var cell = level[x, y];
-                    string cellText = cell.hasMine ? "M" : cell.value.ToString();
-
                     var cellView = Instantiate(cellViewPrefab, root);
                     cellView.name = $"Cell [{x};{y}]";
                     cellView.transform.localPosition = _grid.GetCellCenterLocal(new Vector3Int(x, y, 0));
-                    cellView.Load(x, y, cellText);
-                    if (!cell.hasMine)
-                        cellView.TextColor = colorSheet.GetColor(cell.value);
                     _cellViews[x, y] = cellView;
-
-                    log.Append(cellText).Append(", ");
+                    cellView.Text = string.Empty;
                 }
-
-                log.Append('\n');
             }
             
             MoveLevelCenterToWorldOrigin(xMax, yMax);
-            
-            Debug.Log(log.ToString());
         }
 
         private void MoveLevelCenterToWorldOrigin(int xMax, int yMax)

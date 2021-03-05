@@ -5,10 +5,13 @@ namespace Minesweeper.Runtime.Views
 {
     public class CellView : MonoBehaviour
     {
-        public Vector2Int GridPosition { get; private set; }
-
         [SerializeField] private TextMeshPro textMesh;
         [SerializeField] private SpriteRenderer maskingSprite;
+
+        private void Start()
+        {
+            textMesh.enabled = false;
+        }
 
         public Color TextColor
         {
@@ -16,11 +19,10 @@ namespace Minesweeper.Runtime.Views
             set => textMesh.color = value;
         }
 
-        public void Load(int x, int y, string value)
+        public string Text
         {
-            GridPosition = new Vector2Int(x, y);
-            textMesh.text = value;
-            textMesh.enabled = false;
+            get => textMesh.text;
+            set => textMesh.text = value;
         }
 
         public void Reveal()

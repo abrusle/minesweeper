@@ -11,9 +11,10 @@ namespace Minesweeper.Runtime
         public LevelGridView levelGridView;
         private Cell[,] _level;
 
-        private void Awake()
+        private void Start()
         {
-            GenerateLevel();
+            _level = null;
+            levelGridView.DrawLevelGrid(levelSettings.size.x, levelSettings.size.y);
         }
         
         private void OnEnable()
@@ -31,29 +32,36 @@ namespace Minesweeper.Runtime
             var worldPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             var cellPos = (Vector2Int) levelGridView.Grid.WorldToCell(worldPoint);
             
-            // TODO Generate level on first click. Ensure that cellPos contains a 0.
-
+            if (_level == null || _level.Length == 0)
+            {
+                if (cellPos.x >= 0 && cellPos.x < levelSettings.size.x &&
+                    cellPos.y >= 0 && cellPos.y < levelSettings.size.y) // cell in range
+                {
+                    var reservedEmpty = new Vector2Int[9];
+                    LevelUtility.GetSquareNeighbors(cellPos, reservedEmpty);
+                    reservedEmpty[8] = cellPos;
+                    
+                    _level = LevelGenerator.GenerateNewLevel(
+                        levelSettings.size.x,
+                        levelSettings.size.y,
+                        levelSettings.mineCount,
+                        reservedEmpty);
+                }
+                else return; // no level generated and cell clicked is not in range.
+            }
+            
             RevealHandler.StartRevealChain(_level, cellPos.x, cellPos.y, (cell, pos) =>
             {
-                levelGridView.RevealCell(pos.x, pos.y);
+                levelGridView.RevealCell(cell, pos.x, pos.y);
                 return true;
             });
         }
 
-        private void GenerateLevel()
-        {
-            _level = LevelGenerator.GenerateNewLevel(
-                levelSettings.rowCount,
-                levelSettings.columnCount,
-                levelSettings.mineCount);
-            levelGridView.DrawLevel(_level);
-        }
-
         private void OnGUI()
         {
-            if (GUILayout.Button("Regenerate"))
+            if (GUILayout.Button("Restart"))
             {
-                GenerateLevel();
+                Start();
             }
         }
     }
