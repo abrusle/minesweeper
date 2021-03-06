@@ -157,6 +157,7 @@ MonoBehaviour:
   cellViewPrefab: {fileID: 4434073018627514977, guid: 73ed41e048731b84b87d7f93b7b7369d,
     type: 3}
   colorSheet: {fileID: 11400000, guid: cd52bbba548ebf84ea8311314accab5f, type: 2}
+  revealAnimationInterval: 30
 --- !u!4 &244594976
 Transform:
   m_ObjectHideFlags: 0

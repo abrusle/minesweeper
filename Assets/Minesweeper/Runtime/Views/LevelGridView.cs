@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using Minesweeper.Runtime.Views.Animation;
 using UnityEngine;
 namespace Minesweeper.Runtime.Views
 {
@@ -7,32 +8,33 @@ namespace Minesweeper.Runtime.Views
     [RequireComponent(typeof(Grid))]
     public class LevelGridView : MonoBehaviour
     {
-        public Grid Grid => _grid;
+        public Grid Grid { get; private set; }
 
-        [SerializeField]
-        private CellView cellViewPrefab;
-
+        [SerializeField] private CellView cellViewPrefab;
         [SerializeField] private CellColorSheet colorSheet;
+        [SerializeField, Min(0)] private int revealAnimationInterval;
+        
 
-        private Grid _grid;
         private CellView[,] _cellViews;
+        private AnimationSequence<RevealAnimationDatum> _revealSequence;
 
         private void Awake()
         {
-            _grid = GetComponent<Grid>();
+            Grid = GetComponent<Grid>();
+            _revealSequence = new AnimationSequence<RevealAnimationDatum>(PlayRevealAnimation)
+            {
+                IntervalMiliseconds = revealAnimationInterval
+            };
+        }
+
+        private void OnDestroy()
+        {
+            _revealSequence.Dispose();
         }
 
         public void RevealCell(Cell cell, int x, int y)
         {
-            var cellView = _cellViews[x, y];
-            if (cell.value != 0)
-            {
-                cellView.textMesh.text = cell.hasMine ? "M" : cell.value.ToString();
-                if (!cell.hasMine)
-                    cellView.textMesh.color = colorSheet.GetColor(cell.value);
-                cellView.textMesh.enabled = true;
-            }
-            cellView.backgroundSprite.color = colorSheet.revealedColor;
+            _revealSequence.AddAnimation(new RevealAnimationDatum(cell, x, y));
         }
 
         public void FlagCell(int x, int y)
@@ -47,7 +49,8 @@ namespace Minesweeper.Runtime.Views
 
         public void Clear()
         {
-            foreach (Transform level in _grid.transform)
+            _revealSequence.Dispose();
+            foreach (Transform level in Grid.transform)
             {
                 Destroy(level.gameObject);
             }
@@ -60,7 +63,7 @@ namespace Minesweeper.Runtime.Views
             Clear();
 
             var root = new GameObject($"Level ({xMax} x {yMax})").transform;
-            root.SetParent(_grid.transform);
+            root.SetParent(Grid.transform);
             root.localPosition = Vector3.zero;
             
             _cellViews = new CellView[xMax, yMax];
@@ -71,7 +74,7 @@ namespace Minesweeper.Runtime.Views
                 {
                     var cellView = Instantiate(cellViewPrefab, root);
                     cellView.name = $"Cell [{x};{y}]";
-                    cellView.transform.localPosition = _grid.GetCellCenterLocal(new Vector3Int(x, y, 0));
+                    cellView.transform.localPosition = Grid.GetCellCenterLocal(new Vector3Int(x, y, 0));
                     _cellViews[x, y] = cellView;
                     cellView.textMesh.text = string.Empty;
                     cellView.textMesh.enabled = false;
@@ -85,7 +88,34 @@ namespace Minesweeper.Runtime.Views
         private void MoveLevelCenterToWorldOrigin(int xMax, int yMax)
         {
             var gridPos = new Vector3(-xMax, -yMax, 0);
-            _grid.transform.position = (_grid.cellSize + _grid.cellGap).MultiplyComponents(gridPos) * 0.5f;;
+            Grid.transform.position = (Grid.cellSize + Grid.cellGap).MultiplyComponents(gridPos) * 0.5f;;
+        }
+
+        private void PlayRevealAnimation(RevealAnimationDatum datum)
+        {
+            var cellView = _cellViews[datum.x, datum.y];
+            if (datum.cell.value != 0)
+            {
+                cellView.textMesh.text = datum.cell.hasMine ? "M" : datum.cell.value.ToString();
+                if (!datum.cell.hasMine)
+                    cellView.textMesh.color = colorSheet.GetColor(datum.cell.value);
+                cellView.textMesh.enabled = true;
+            }
+
+            cellView.backgroundSprite.color = colorSheet.revealedColor;
+        }
+
+        private readonly struct RevealAnimationDatum
+        {
+            public readonly Cell cell;
+            public readonly int x, y;
+
+            public RevealAnimationDatum(Cell cell, int x, int y)
+            {
+                this.cell = cell;
+                this.x = x;
+                this.y = y;
+            }
         }
     }
 }

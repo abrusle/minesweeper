@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Minesweeper.Runtime.Views
+namespace Minesweeper.Runtime
 {
     public static class LevelUtility
     {
