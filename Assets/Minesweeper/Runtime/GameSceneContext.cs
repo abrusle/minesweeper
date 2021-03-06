@@ -20,18 +20,19 @@ namespace Minesweeper.Runtime
         private void OnEnable()
         {
             InputHandler.LeftClick += OnLeftClick;
+            InputHandler.RightClick += OnRightClick;
         }
 
         private void OnDisable()
         {
             InputHandler.LeftClick -= OnLeftClick;
+            InputHandler.RightClick -= OnRightClick;
         }
 
         private void OnLeftClick()
         {
-            var worldPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            var cellPos = (Vector2Int) levelGridView.Grid.WorldToCell(worldPoint);
-            
+            var cellPos = GetCellPositionAtCursor();
+
             if (_level == null || _level.Length == 0)
             {
                 if (cellPos.x >= 0 && cellPos.x < levelSettings.size.x &&
@@ -55,6 +56,25 @@ namespace Minesweeper.Runtime
                 levelGridView.RevealCell(cell, pos.x, pos.y);
                 return true;
             });
+        }
+
+        private void OnRightClick()
+        {
+            if (_level == null || _level.Length == 0) return;
+            var cellPos = GetCellPositionAtCursor();
+
+            if (_level.TryGetValue(cellPos, out var cell) && !cell.isRevealed)
+            {
+                if (cell.hasFlag) levelGridView.UnflagCell(cellPos.x, cellPos.y);
+                else levelGridView.FlagCell(cellPos.x, cellPos.y);
+                _level[cellPos.x, cellPos.y].hasFlag = !cell.hasFlag;
+            }
+        }
+
+        private Vector2Int GetCellPositionAtCursor()
+        {
+            var worldPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            return (Vector2Int) levelGridView.Grid.WorldToCell(worldPoint);
         }
 
         private void OnGUI()

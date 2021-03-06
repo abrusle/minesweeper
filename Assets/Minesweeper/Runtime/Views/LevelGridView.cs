@@ -25,10 +25,24 @@ namespace Minesweeper.Runtime.Views
         public void RevealCell(Cell cell, int x, int y)
         {
             var cellView = _cellViews[x, y];
-            cellView.Text = cell.hasMine ? "M" : cell.value.ToString();
-            if (!cell.hasMine)
-                cellView.TextColor = colorSheet.GetColor(cell.value);
-            cellView.Reveal();
+            if (cell.value != 0)
+            {
+                cellView.textMesh.text = cell.hasMine ? "M" : cell.value.ToString();
+                if (!cell.hasMine)
+                    cellView.textMesh.color = colorSheet.GetColor(cell.value);
+                cellView.textMesh.enabled = true;
+            }
+            cellView.backgroundSprite.color = colorSheet.revealedColor;
+        }
+
+        public void FlagCell(int x, int y)
+        {
+            _cellViews[x,y].backgroundSprite.color = new Color(1f, 0.94f, 0.51f);
+        }
+
+        public void UnflagCell(int x, int y)
+        {
+            _cellViews[x,y].backgroundSprite.color = colorSheet.unrevealedColor;
         }
 
         public void Clear()
@@ -59,7 +73,9 @@ namespace Minesweeper.Runtime.Views
                     cellView.name = $"Cell [{x};{y}]";
                     cellView.transform.localPosition = _grid.GetCellCenterLocal(new Vector3Int(x, y, 0));
                     _cellViews[x, y] = cellView;
-                    cellView.Text = string.Empty;
+                    cellView.textMesh.text = string.Empty;
+                    cellView.textMesh.enabled = false;
+                    cellView.backgroundSprite.color = colorSheet.unrevealedColor;
                 }
             }
             

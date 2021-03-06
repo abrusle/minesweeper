@@ -8,6 +8,8 @@ namespace Minesweeper.Runtime.Data
     public class CellColorSheet : ScriptableObject
     {
         public ColorRule[] rules;
+
+        public Color unrevealedColor, revealedColor;
         
         [Serializable]
         public struct ColorRule

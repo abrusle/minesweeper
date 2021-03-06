@@ -25,33 +25,6 @@ namespace Minesweeper.Runtime
                     if (cells.HasValuesIsInRange(neighbor))
                         cells[neighbor.x, neighbor.y].value++;
                 }
-
-                // indicate neighbors
-                /*if (pos.x < xMax - 1)
-                {
-                    cells[pos.x + 1, pos.y].value++;
-
-                    if (pos.y < yMax - 1)
-                        cells[pos.x + 1, pos.y + 1].value++;
-                    if (pos.y > 0)
-                        cells[pos.x + 1, pos.y - 1].value++;
-                }
-
-                if (pos.y < yMax - 1)
-                    cells[pos.x, pos.y + 1].value++;
-
-                if (pos.x > 0)
-                {
-                    cells[pos.x - 1, pos.y].value++;
-
-                    if (pos.y > 0)
-                        cells[pos.x - 1, pos.y - 1].value++;
-                    if (pos.y < yMax - 1)
-                        cells[pos.x - 1, pos.y + 1].value++;
-                }
-
-                if (pos.y > 0)
-                    cells[pos.x, pos.y - 1].value++;*/
             }
 
             return cells;
@@ -67,7 +40,7 @@ namespace Minesweeper.Runtime
             {
                 var pt = RandomPoint(xMin, xMax, yMin, yMax);
                 if (Array.IndexOf(points, pt) != -1 || // a point with these coordinates was already generated
-                    Array.IndexOf(exculdedPoints, pt) != -1) // pt is part of the points to exculde
+                    Array.IndexOf(exculdedPoints, pt) != -1) // pt is part of the points to exclude
                     i--; // redo the loop for the same value of i;
                 else points[i] = pt;
             }
@@ -84,9 +57,6 @@ namespace Minesweeper.Runtime
             };
         }
         
-        private class InvalidRangeException : System.Exception
-        {
-            
-        }
+        private class InvalidRangeException : System.Exception { }
     }
 }

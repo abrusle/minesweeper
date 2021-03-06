@@ -23,3 +23,5 @@ MonoBehaviour:
     color: {r: 1, g: 0.19994353, b: 0.18396229, a: 1}
   - threshold: 4
     color: {r: 0.6886792, g: 0, b: 0.11384615, a: 1}
+  unrevealedColor: {r: 0, g: 0.30588236, b: 0.34901962, a: 1}
+  revealedColor: {r: 0, g: 0.4392157, b: 0.42352942, a: 1}
