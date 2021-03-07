@@ -11,7 +11,7 @@ namespace Minesweeper.Runtime.Views
         public Grid Grid { get; private set; }
 
         [SerializeField] private CellView cellViewPrefab;
-        [SerializeField] private CellColorSheet colorSheet;
+        [SerializeField] private ColorSheet colorSheet;
         [SerializeField, Min(0)] private int revealAnimationInterval;
         
 
@@ -32,9 +32,13 @@ namespace Minesweeper.Runtime.Views
             _revealSequence.Dispose();
         }
 
-        public void RevealCell(Cell cell, int x, int y)
+        public void RevealCell(Cell cell, int x, int y, bool animated = true)
         {
-            _revealSequence.AddAnimation(new RevealAnimationDatum(cell, x, y));
+            var datum = new RevealAnimationDatum(cell, x, y);
+            if (animated)
+                _revealSequence.AddAnimation(datum);
+            else
+                PlayRevealAnimation(datum);
         }
 
         public void FlagCell(int x, int y)
@@ -85,6 +89,21 @@ namespace Minesweeper.Runtime.Views
             MoveLevelCenterToWorldOrigin(xMax, yMax);
         }
 
+        public void OnGameStart(Camera bgCamera)
+        {
+            bgCamera.backgroundColor = colorSheet.bgColor;
+        }
+
+        public void DrawGameOver(Camera bgCamera)
+        {
+            bgCamera.backgroundColor = colorSheet.gameOverBgColor;
+        }
+
+        public void DrawGameWon(Camera bgCamera)
+        {
+            bgCamera.backgroundColor = colorSheet.gameWonBgColor;
+        }
+
         private void MoveLevelCenterToWorldOrigin(int xMax, int yMax)
         {
             var gridPos = new Vector3(-xMax, -yMax, 0);
@@ -96,9 +115,15 @@ namespace Minesweeper.Runtime.Views
             var cellView = _cellViews[datum.x, datum.y];
             if (datum.cell.value != 0)
             {
-                cellView.textMesh.text = datum.cell.hasMine ? "M" : datum.cell.value.ToString();
+                cellView.textMesh.text = datum.cell.hasMine ? "•" : datum.cell.value.ToString();
                 if (!datum.cell.hasMine)
                     cellView.textMesh.color = colorSheet.GetColor(datum.cell.value);
+                else
+                {
+                    cellView.textMesh.color = colorSheet.mineColor;
+                    cellView.textMesh.fontSize = 8;
+                }
+                
                 cellView.textMesh.enabled = true;
             }
 

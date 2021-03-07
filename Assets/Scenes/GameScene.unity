@@ -157,7 +157,7 @@ MonoBehaviour:
   cellViewPrefab: {fileID: 4434073018627514977, guid: 73ed41e048731b84b87d7f93b7b7369d,
     type: 3}
   colorSheet: {fileID: 11400000, guid: cd52bbba548ebf84ea8311314accab5f, type: 2}
-  revealAnimationInterval: 30
+  revealAnimationInterval: 2
 --- !u!4 &244594976
 Transform:
   m_ObjectHideFlags: 0
@@ -237,7 +237,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 8.19
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2

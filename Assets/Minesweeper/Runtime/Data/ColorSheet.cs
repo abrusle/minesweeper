@@ -5,12 +5,20 @@ using UnityEngine;
 namespace Minesweeper.Runtime.Data
 {
     [CreateAssetMenu(fileName = "new Cell Color Sheet", menuName = "Data/Cell Color Sheet", order = 0)]
-    public class CellColorSheet : ScriptableObject
+    public class ColorSheet : ScriptableObject
     {
+        [Header("Cells")]
         public ColorRule[] rules;
-
-        public Color unrevealedColor, revealedColor;
+        [Space]
+        public Color mineColor;
+        public Color unrevealedColor;
+        public Color revealedColor;
         
+        [Header("World")]
+        public Color bgColor;
+        public Color gameOverBgColor;
+        public Color gameWonBgColor;
+
         [Serializable]
         public struct ColorRule
         {
@@ -21,9 +29,8 @@ namespace Minesweeper.Runtime.Data
         public Color GetColor(int value)
         {
             rules = rules.OrderBy(r => r.threshold).ToArray();
-            for (int i = 0; i < rules.Length; i++)
+            foreach (var rule in rules)
             {
-                var rule = rules[i];
                 if (value <= rule.threshold) return rule.color;
             }
 

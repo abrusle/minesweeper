@@ -1,4 +1,6 @@
-﻿using Minesweeper.Runtime.Data;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Minesweeper.Runtime.Data;
 using Minesweeper.Runtime.Views;
 using UnityEngine;
 
@@ -9,11 +11,23 @@ namespace Minesweeper.Runtime
         public Camera mainCamera;
         public LevelSettings levelSettings;
         public LevelGridView levelGridView;
+        
         private Cell[,] _level;
+        private int _emptyCellsLeft;
+        private GameState _gameState;
+
+        private enum GameState
+        {
+            Running, Over, Won
+        }
 
         private void Start()
         {
             _level = null;
+            _emptyCellsLeft = levelSettings.size.x * levelSettings.size.y;
+            _gameState = GameState.Running;
+            levelGridView.OnGameStart(mainCamera);
+            mainCamera.orthographicSize = Mathf.Max(levelSettings.size.x, levelSettings.size.y) * .5f;
             levelGridView.DrawLevelGrid(levelSettings.size.x, levelSettings.size.y);
         }
         
@@ -31,6 +45,7 @@ namespace Minesweeper.Runtime
 
         private void OnLeftClick()
         {
+            if (_gameState != GameState.Running) return;
             var cellPos = GetCellPositionAtCursor();
 
             if (_level == null || _level.Length == 0)
@@ -39,7 +54,7 @@ namespace Minesweeper.Runtime
                     cellPos.y >= 0 && cellPos.y < levelSettings.size.y) // cell in range
                 {
                     var reservedEmpty = new Vector2Int[9];
-                    LevelUtility.GetSquareNeighbors(cellPos, reservedEmpty);
+                    LevelUtility.GetAdjacentCellsSquare(cellPos, reservedEmpty);
                     reservedEmpty[8] = cellPos;
                     
                     _level = LevelGenerator.GenerateNewLevel(
@@ -50,23 +65,45 @@ namespace Minesweeper.Runtime
                 }
                 else return; // no level generated and cell clicked is not in range.
             }
-            
-            RevealHandler.StartRevealChain(_level, cellPos.x, cellPos.y, (cell, pos) =>
+
+            if (_level.TryGetValue(cellPos, out var cell))
             {
-                levelGridView.RevealCell(cell, pos.x, pos.y);
-                return true;
-            });
+                if (cell.hasMine)
+                {
+                    OnGameOver();
+                    return;
+                }
+                
+                if (cell.hasFlag)
+                    return;
+            }
+
+            var toReveal = new Dictionary<Vector2Int, Cell>();
+            RevealHandler.RevealCellsRecursively(_level, cellPos.x, cellPos.y, toReveal);
+
+            foreach (var pair in toReveal.OrderBy(a => Vector2Int.Distance(cellPos, a.Key)))
+            {
+                levelGridView.RevealCell(pair.Value, pair.Key.x, pair.Key.y);
+            }
+
+            _emptyCellsLeft -= toReveal.Count;
+            if (_emptyCellsLeft <= levelSettings.mineCount)
+                OnGameWon();
         }
 
         private void OnRightClick()
         {
+            if (_gameState != GameState.Running) return;
             if (_level == null || _level.Length == 0) return;
             var cellPos = GetCellPositionAtCursor();
 
             if (_level.TryGetValue(cellPos, out var cell) && !cell.isRevealed)
             {
-                if (cell.hasFlag) levelGridView.UnflagCell(cellPos.x, cellPos.y);
-                else levelGridView.FlagCell(cellPos.x, cellPos.y);
+                if (cell.hasFlag) 
+                    levelGridView.UnflagCell(cellPos.x, cellPos.y);
+                else 
+                    levelGridView.FlagCell(cellPos.x, cellPos.y);
+                
                 _level[cellPos.x, cellPos.y].hasFlag = !cell.hasFlag;
             }
         }
@@ -75,6 +112,38 @@ namespace Minesweeper.Runtime
         {
             var worldPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             return (Vector2Int) levelGridView.Grid.WorldToCell(worldPoint);
+        }
+
+        private void OnGameWon()
+        {
+            _gameState = GameState.Won;
+            levelGridView.DrawGameWon(mainCamera);
+
+            for (int x = 0; x < _level.GetLength(0); x++)
+            {
+                for (int y = 0; y < _level.GetLength(1); y++)
+                {
+                    var cell = _level[x, y];
+                    if (cell.hasMine)
+                        levelGridView.FlagCell(x, y);
+                }
+            }
+        }
+
+        private void OnGameOver()
+        {
+            _gameState = GameState.Over;
+            levelGridView.DrawGameOver(mainCamera);
+            
+            for (int x = 0; x < _level.GetLength(0); x++)
+            {
+                for (int y = 0; y < _level.GetLength(1); y++)
+                {
+                    var cell = _level[x, y];
+                    if (cell.hasMine) 
+                        levelGridView.RevealCell(cell, x, y, false);
+                }
+            }
         }
 
         private void OnGUI()

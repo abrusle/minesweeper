@@ -19,7 +19,7 @@ namespace Minesweeper.Runtime
                 cells[pos.x, pos.y].hasMine = true;
 
                 var mineNeighbors = new Vector2Int[8];
-                LevelUtility.GetSquareNeighbors(pos, mineNeighbors);
+                LevelUtility.GetAdjacentCellsSquare(pos, mineNeighbors);
                 foreach (var neighbor in mineNeighbors)
                 {
                     if (cells.HasValuesIsInRange(neighbor))
