@@ -115,7 +115,7 @@ namespace Minesweeper.Runtime.Views
             var cellView = _cellViews[datum.x, datum.y];
             if (datum.cell.value != 0)
             {
-                cellView.textMesh.text = datum.cell.hasMine ? "•" : datum.cell.value.ToString();
+                cellView.textMesh.text = datum.cell.hasMine ? "*" : datum.cell.value.ToString();
                 if (!datum.cell.hasMine)
                     cellView.textMesh.color = colorSheet.GetColor(datum.cell.value);
                 else
