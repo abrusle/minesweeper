@@ -1,13 +1,22 @@
 ﻿using System;
 using System.Collections;
+using Minesweeper.Runtime.Data;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace Minesweeper.Runtime.Views
 {
-    public class HoverIndicatorView : MonoBehaviour
+    public class CursorView : MonoBehaviour
     {
+        [Header("Scene Dependencies")]
         public Grid grid;
+        
+        [Header("Cursor Data")]
+        [SerializeField] private CursorSetup normalCursor;
+        [SerializeField] private CursorSetup pointerCursor;
+
+
+        [Header("Cell Highlight")]
         public bool animate = true;
         [FormerlySerializedAs("durationMult")]
         [Min(0.01f)] public float durationMultiplier = 1;
@@ -30,29 +39,31 @@ namespace Minesweeper.Runtime.Views
                 cellAtCursor.x > positionMax.x ||
                 cellAtCursor.y > positionMax.y)
             {
-                HideCursor();
+                CursorUtility.SetCursor(normalCursor);
+                HideHighlight();
             }
             else if (_isVisible == false || animate == false)
             {
-                ShowCursor();
+                CursorUtility.SetCursor(pointerCursor);
+                ShowHighlight();
             }
-            else TransitionCursor(previous, _currentPosition);
+            else TransitionHighlight(_currentPosition);
             
         }
 
-        private void HideCursor()
+        private void HideHighlight()
         {
             if (_isVisible != false)
                 gameObject.SetActive(_isVisible = false);
         }
 
-        private void ShowCursor()
+        private void ShowHighlight()
         {
             gameObject.SetActive(_isVisible = true);
             transform.position = CellToWorld(_currentPosition);
         }
 
-        private void TransitionCursor(Vector2Int from, Vector2Int to)
+        private void TransitionHighlight(Vector2Int to)
         {
             if (_transitionCoroutine != null)
             {
@@ -60,11 +71,10 @@ namespace Minesweeper.Runtime.Views
                 _transitionCoroutine = null;
             }
 
-            // Debug.Log($"transition start from {from} to {to}");
-            _transitionCoroutine = StartCoroutine(CoroutineTransition(CellToWorld(to)));
+            _transitionCoroutine = StartCoroutine(CoroutineTransitionHighlight(CellToWorld(to)));
         }
 
-        private IEnumerator CoroutineTransition(Vector3 to)
+        private IEnumerator CoroutineTransitionHighlight(Vector3 to)
         {
             var from = transform.position;
 

@@ -313,7 +313,7 @@ MonoBehaviour:
   mainCamera: {fileID: 519420031}
   levelSettings: {fileID: 11400000, guid: e2bbbae7fc1881246a6304a9a4609c14, type: 2}
   levelGridView: {fileID: 244594975}
-  hoverIndicator: {fileID: 1149368403}
+  cursor: {fileID: 1149368403}
 --- !u!1 &1149368401
 GameObject:
   m_ObjectHideFlags: 0
@@ -359,8 +359,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   grid: {fileID: 244594977}
+  normalCursor: {fileID: 11400000, guid: e784ee35ad5bdeb4b86f5f31c8bbd377, type: 2}
+  pointerCursor: {fileID: 11400000, guid: 77ad4cca72ec5844c9453f676c27da8c, type: 2}
   animate: 1
-  durationMultiplier: 20
+  durationMultiplier: 30
 --- !u!1 &2072471247
 GameObject:
   m_ObjectHideFlags: 0

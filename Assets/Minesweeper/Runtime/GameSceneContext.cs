@@ -4,6 +4,7 @@ using System.Linq;
 using Minesweeper.Runtime.Data;
 using Minesweeper.Runtime.Views;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Minesweeper.Runtime
 {
@@ -12,7 +13,7 @@ namespace Minesweeper.Runtime
         public Camera mainCamera;
         public LevelSettings levelSettings;
         public LevelGridView levelGridView;
-        public HoverIndicatorView hoverIndicator;
+        [FormerlySerializedAs("hoverIndicator")] public CursorView cursor;
         
         private Cell[,] _level;
         private int _emptyCellsLeft;
@@ -29,8 +30,8 @@ namespace Minesweeper.Runtime
             _level = null;
             _emptyCellsLeft = levelSettings.size.x * levelSettings.size.y;
             _gameState = GameState.Running;
-            hoverIndicator.positionMin = Vector2Int.zero;
-            hoverIndicator.positionMax = levelSettings.size - Vector2Int.one;
+            cursor.positionMin = Vector2Int.zero;
+            cursor.positionMax = levelSettings.size - Vector2Int.one;
             levelGridView.OnGameStart(mainCamera);
             mainCamera.orthographicSize = Mathf.Max(levelSettings.size.x, levelSettings.size.y) * .5f;
             levelGridView.DrawLevelGrid(levelSettings.size.x, levelSettings.size.y);
@@ -54,7 +55,7 @@ namespace Minesweeper.Runtime
             {
                 var worldPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
                 _cursorGridPos = (Vector2Int) levelGridView.Grid.WorldToCell(worldPoint);
-                hoverIndicator.UpdatePosition(_cursorGridPos);
+                cursor.UpdatePosition(_cursorGridPos);
             }
         }
 
