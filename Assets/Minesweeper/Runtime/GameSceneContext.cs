@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Minesweeper.Runtime.Data;
 using Minesweeper.Runtime.Views;
@@ -11,10 +12,12 @@ namespace Minesweeper.Runtime
         public Camera mainCamera;
         public LevelSettings levelSettings;
         public LevelGridView levelGridView;
+        public HoverIndicatorView hoverIndicator;
         
         private Cell[,] _level;
         private int _emptyCellsLeft;
         private GameState _gameState;
+        private Vector2Int _cursorGridPos;
 
         private enum GameState
         {
@@ -26,6 +29,8 @@ namespace Minesweeper.Runtime
             _level = null;
             _emptyCellsLeft = levelSettings.size.x * levelSettings.size.y;
             _gameState = GameState.Running;
+            hoverIndicator.positionMin = Vector2Int.zero;
+            hoverIndicator.positionMax = levelSettings.size - Vector2Int.one;
             levelGridView.OnGameStart(mainCamera);
             mainCamera.orthographicSize = Mathf.Max(levelSettings.size.x, levelSettings.size.y) * .5f;
             levelGridView.DrawLevelGrid(levelSettings.size.x, levelSettings.size.y);
@@ -43,10 +48,20 @@ namespace Minesweeper.Runtime
             InputHandler.RightClick -= OnRightClick;
         }
 
+        private void Update()
+        {
+            if (_gameState == GameState.Running)
+            {
+                var worldPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+                _cursorGridPos = (Vector2Int) levelGridView.Grid.WorldToCell(worldPoint);
+                hoverIndicator.UpdatePosition(_cursorGridPos);
+            }
+        }
+
         private void OnLeftClick()
         {
             if (_gameState != GameState.Running) return;
-            var cellPos = GetCellPositionAtCursor();
+            var cellPos = _cursorGridPos;
 
             if (_level == null || _level.Length == 0)
             {
@@ -95,7 +110,7 @@ namespace Minesweeper.Runtime
         {
             if (_gameState != GameState.Running) return;
             if (_level == null || _level.Length == 0) return;
-            var cellPos = GetCellPositionAtCursor();
+            var cellPos = _cursorGridPos;
 
             if (_level.TryGetValue(cellPos, out var cell) && !cell.isRevealed)
             {
@@ -106,12 +121,6 @@ namespace Minesweeper.Runtime
                 
                 _level[cellPos.x, cellPos.y].hasFlag = !cell.hasFlag;
             }
-        }
-
-        private Vector2Int GetCellPositionAtCursor()
-        {
-            var worldPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            return (Vector2Int) levelGridView.Grid.WorldToCell(worldPoint);
         }
 
         private void OnGameWon()

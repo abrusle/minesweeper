@@ -15,6 +15,7 @@ namespace Minesweeper.Runtime
             if (_Instance != null) return;
 
             _Instance = new GameObject(nameof(InputHandler)).AddComponent<InputHandler>();
+            DontDestroyOnLoad(_Instance);
         }
         
         private void Awake()
