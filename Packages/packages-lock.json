@@ -12,31 +12,11 @@
       "source": "builtin",
       "dependencies": {}
     },
-    "com.unity.ext.nunit": {
-      "version": "1.0.5",
-      "depth": 2,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
     "com.unity.ide.rider": {
-      "version": "1.2.1",
+      "version": "3.0.5",
       "depth": 0,
       "source": "registry",
-      "dependencies": {
-        "com.unity.test-framework": "1.1.1"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.test-framework": {
-      "version": "1.1.19",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.ext.nunit": "1.0.5",
-        "com.unity.modules.imgui": "1.0.0",
-        "com.unity.modules.jsonserialize": "1.0.0"
-      },
+      "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "com.unity.textmeshpro": {
@@ -56,6 +36,20 @@
         "com.unity.modules.ui": "1.0.0",
         "com.unity.modules.imgui": "1.0.0"
       }
+    },
+    "net.abrusle.scriptable-singletons": {
+      "version": "https://github.com/abrusle/unity-scriptable-singletons.git#1.0.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "71b08928ab0e0af1aa7a4703f9c04930c05f940f"
+    },
+    "net.abrusle.unity-coroutween": {
+      "version": "https://github.com/abrusle/unity-coroutween.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "e09b40067eab6354210f1712edfe636909bce338"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",
@@ -211,15 +205,6 @@
       "depth": 0,
       "source": "builtin",
       "dependencies": {}
-    },
-    "com.unity.modules.unityanalytics": {
-      "version": "1.0.0",
-      "depth": 0,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.modules.unitywebrequest": "1.0.0",
-        "com.unity.modules.jsonserialize": "1.0.0"
-      }
     },
     "com.unity.modules.unitywebrequest": {
       "version": "1.0.0",

@@ -1,7 +1,8 @@
 {
     "name": "Minesweeper.Runtime",
     "references": [
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Abrusle.ScriptableSingleton"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

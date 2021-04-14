@@ -13,27 +13,31 @@ namespace Minesweeper.Runtime
         public Camera mainCamera;
         public LevelSettings levelSettings;
         public LevelGridView levelGridView;
+        public GameUiView uiView;
         [FormerlySerializedAs("hoverIndicator")] public CursorView cursor;
         
         private Cell[,] _level;
         private int _emptyCellsLeft;
         private GameState _gameState;
         private Vector2Int _cursorGridPos;
+        private int _flagCount;
 
         private enum GameState
         {
             Running, Over, Won
         }
 
-        private void Start()
+        public void Start()
         {
             _level = null;
             _emptyCellsLeft = levelSettings.size.x * levelSettings.size.y;
+            _flagCount = 0;
             _gameState = GameState.Running;
             cursor.positionMin = Vector2Int.zero;
             cursor.positionMax = levelSettings.size - Vector2Int.one;
             levelGridView.OnGameStart(mainCamera);
             mainCamera.orthographicSize = Mathf.Max(levelSettings.size.x, levelSettings.size.y) * .5f;
+            uiView.OnMinesLeftCountChange(levelSettings.mineCount);
             levelGridView.DrawLevelGrid(levelSettings.size.x, levelSettings.size.y);
         }
         
@@ -115,12 +119,19 @@ namespace Minesweeper.Runtime
 
             if (_level.TryGetValue(cellPos, out var cell) && !cell.isRevealed)
             {
-                if (cell.hasFlag) 
+                if (cell.hasFlag)
+                {
                     levelGridView.UnflagCell(cellPos.x, cellPos.y);
-                else 
+                    _flagCount--;
+                }
+                else
+                {
                     levelGridView.FlagCell(cellPos.x, cellPos.y);
+                    _flagCount++;
+                }
                 
                 _level[cellPos.x, cellPos.y].hasFlag = !cell.hasFlag;
+                uiView.OnMinesLeftCountChange(levelSettings.mineCount - _flagCount);
             }
         }
 
@@ -153,14 +164,6 @@ namespace Minesweeper.Runtime
                     if (cell.hasMine) 
                         levelGridView.RevealCell(cell, x, y, false);
                 }
-            }
-        }
-
-        private void OnGUI()
-        {
-            if (GUILayout.Button("Restart"))
-            {
-                Start();
             }
         }
     }
