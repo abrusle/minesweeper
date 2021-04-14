@@ -1,9 +1,8 @@
-﻿using System;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Minesweeper.Runtime.Views
+namespace Minesweeper.Runtime.Views.UI
 {
     public class MainMenuView : MonoBehaviour
     {
