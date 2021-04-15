@@ -1,10 +1,10 @@
-﻿using Minesweeper.Runtime.Views.UI.Animation;
+﻿using System;
+using Minesweeper.Runtime.Views.UI.Animation;
 using UnityEditor;
 using UnityEngine;
 using static UnityEditor.EditorGUILayout;
-using static UnityEditor.EditorGUI;
 
-namespace Minesweeper.Editor
+namespace Minesweeper.Editor.Inspectors
 {
     /// <summary>
     /// Left to do:
@@ -16,10 +16,8 @@ namespace Minesweeper.Editor
     /// - Detect click on a transition
     ///     - Allow duplicating and deleting selected transition
     /// </summary>
-    [CustomEditor(typeof(MainMenuAnimationStateMachine))]
-    internal class MainMenuAnimationStateMachineEditor : UnityEditor.Editor
+    internal abstract class AnimationStateMachineEditor<TState> : UnityEditor.Editor where TState : struct, Enum
     {
-
         private static readonly Color InvalidColor = new Color(1f, 0.36f, 0.36f);
         
         private struct Properties
@@ -40,6 +38,7 @@ namespace Minesweeper.Editor
         private Properties _properties;
         private Contents _contents;
         private bool _cancelCurrentTransitionDrawLoop;
+        protected AnimationStateMachine<TState> targetStateMachine;
 
         private void OnEnable()
         {
@@ -55,14 +54,21 @@ namespace Minesweeper.Editor
                 animationClip = new GUIContent("Animation Clip"),
                 addButton = new GUIContent("+", "Add Transition")
             };
+
+            targetStateMachine = (AnimationStateMachine<TState>) target;
         }
 
         /// <inheritdoc />
         public override void OnInspectorGUI()
         {
+            LabelField(target.name, EditorStyles.whiteLargeLabel);
+            Separator();
             PropertyField(_properties.startState);
+            LabelField("Current State", targetStateMachine.CurrentState.ToString());
+            
             Separator();
             LabelField("Transitions", EditorStyles.whiteLargeLabel);
+            Separator();
 
             _cancelCurrentTransitionDrawLoop = false;
             int transitionCount = _properties.transitions.arraySize;
@@ -105,7 +111,7 @@ namespace Minesweeper.Editor
                         DrawState(transitionIndex, transitionProp, "to");
                     }
 
-                    var clipProp = _properties.clips.GetArrayElementAtIndex(transitionIndex);
+                    SerializedProperty clipProp = _properties.clips.GetArrayElementAtIndex(transitionIndex);
                     var initialClip = clipProp.objectReferenceValue;
                     var newClip = ObjectField(_contents.animationClip, initialClip, typeof(AnimationClip), false);
                     if (newClip != initialClip)
@@ -113,6 +119,8 @@ namespace Minesweeper.Editor
                         clipProp.objectReferenceValue = newClip;
                         OnTransitionPropertiesChanged(transitionIndex);
                     }
+
+                    OnGuiAdditionalTransitionContent(transitionIndex, transitionProp);
                 }
 
                 if (GUILayout.Button("x", GUILayout.ExpandHeight(true), GUILayout.Width(20)))
@@ -122,12 +130,13 @@ namespace Minesweeper.Editor
 
         private void DrawState(int transitionIndex, SerializedProperty transitionProp, string statePropPath)
         {
-            var fromProp = transitionProp.FindPropertyRelative(statePropPath);
-            var initialFromValue = (MainMenuState) fromProp.enumValueIndex;
-            var newFromValue = (MainMenuState) EnumPopup(initialFromValue);
-            if (initialFromValue != newFromValue)
+            SerializedProperty prop = transitionProp.FindPropertyRelative(statePropPath);
+
+            int intValueInitial = prop.enumValueIndex;
+            int intValueNew = Convert.ToInt32((TState) EnumPopup((TState)(object) intValueInitial));
+            if (intValueInitial != intValueNew)
             {
-                fromProp.enumValueIndex = (int) newFromValue;
+                prop.enumValueIndex = intValueNew;
                 OnTransitionPropertiesChanged(transitionIndex);
             }
         }
@@ -144,5 +153,8 @@ namespace Minesweeper.Editor
         {
             serializedObject.ApplyModifiedProperties();
         }
+
+        protected virtual void OnGuiAdditionalTransitionContent(int transitionIndex, SerializedProperty transitionProp)
+        { }
     }
 }

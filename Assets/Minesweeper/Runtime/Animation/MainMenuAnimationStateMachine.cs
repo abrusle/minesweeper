@@ -2,7 +2,7 @@
 
 namespace Minesweeper.Runtime.Views.UI.Animation
 {
-    public enum MainMenuState : byte
+    public enum MainMenuState
     {
         Default = 0,
         Classic = 1,

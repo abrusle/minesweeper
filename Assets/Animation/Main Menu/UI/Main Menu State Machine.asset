@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 66598312b5d142779d42caa4f07693b3, type: 3}
-  m_Name: Main Menu Animation State Machine
+  m_Name: Main Menu State Machine
   m_EditorClassIdentifier: 
   startState: 0
   transitions:
@@ -20,4 +20,4 @@ MonoBehaviour:
     to: 0
   transitionClips:
   - {fileID: 7400000, guid: f49d11cc336a17447acf804593f688fa, type: 2}
-  - {fileID: 0}
+  - {fileID: -6791543883584319732, guid: 92db16672d9c3484ba19c90822296a83, type: 2}

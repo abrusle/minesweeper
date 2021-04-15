@@ -25,6 +25,7 @@ namespace Minesweeper.Runtime.Views.UI.Animation
 
         [SerializeField] private TState startState;
 
+        // TODO : Why have 2 distinc arrays for transitions and clips? (a Transition always has a clip)
         [SerializeField] private Transition[] transitions;
         [SerializeField] private AnimationClip[] transitionClips;
 

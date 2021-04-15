@@ -1,4 +1,5 @@
 ﻿using UnityEditor;
+using UnityEngine;
 
 namespace Minesweeper.Editor
 {
@@ -6,7 +7,7 @@ namespace Minesweeper.Editor
     {
         public static void AddEmptyArrayElement(this SerializedProperty prop)
         {
-            prop.InsertArrayElementAtIndex(prop.arraySize - 1);
+            prop.InsertArrayElementAtIndex(Mathf.Max(0, prop.arraySize - 1));
         }
     }
 }
