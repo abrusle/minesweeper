@@ -35,6 +35,24 @@ namespace Minesweeper.Editor.Inspectors.Specific
                 };
             }
 
+            var events = AnimationUtility.GetAnimationEvents(source);
+            for (var eventIndex = 0; eventIndex < events.Length; eventIndex++)
+            {
+                var srcEvent = events[eventIndex];
+
+                events[eventIndex] = new AnimationEvent
+                {
+                    time = durationSeconds - srcEvent.time,
+                    floatParameter = srcEvent.floatParameter,
+                    functionName = srcEvent.functionName,
+                    stringParameter = srcEvent.stringParameter,
+                    intParameter = srcEvent.intParameter,
+                    messageOptions = srcEvent.messageOptions,
+                    objectReferenceParameter = srcEvent.objectReferenceParameter
+                };
+            }
+
+            AnimationUtility.SetAnimationEvents(result, events);
             AnimationUtility.SetEditorCurves(result, srcBindings, modifiedCurves);
         }
 

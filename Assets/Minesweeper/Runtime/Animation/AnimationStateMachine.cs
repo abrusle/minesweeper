@@ -38,7 +38,7 @@ namespace Minesweeper.Runtime.Views.UI.Animation
         {
             var clip = GetAnimationClip(new Transition(CurrentState, state));
             if (clip == null)
-                throw new StateMachineException($"Transition from {CurrentState} to {state}");
+                throw new StateMachineException($"Transition from {CurrentState} to {state} does not exist.");
             CurrentState = state;
             return clip;
         }

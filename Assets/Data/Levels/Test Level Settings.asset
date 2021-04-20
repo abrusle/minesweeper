@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Test Level Settings
   m_EditorClassIdentifier: 
   size: {x: 15, y: 12}
-  mineCount: 34
+  mineCount: 25

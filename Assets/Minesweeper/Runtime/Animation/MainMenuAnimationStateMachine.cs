@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using Minesweeper.Runtime.Views.UI.Animation;
+using UnityEngine;
 
-namespace Minesweeper.Runtime.Views.UI.Animation
+namespace Minesweeper.Runtime.Animation
 {
     public enum MainMenuState
     {

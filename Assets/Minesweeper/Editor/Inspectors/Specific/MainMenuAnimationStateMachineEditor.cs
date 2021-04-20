@@ -1,4 +1,5 @@
-﻿using Minesweeper.Runtime.Views.UI.Animation;
+﻿using Minesweeper.Runtime.Animation;
+using Minesweeper.Runtime.Views.UI.Animation;
 using UnityEditor;
 
 namespace Minesweeper.Editor.Inspectors.Specific
