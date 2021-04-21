@@ -1,8 +1,11 @@
 {
     "name": "Minesweeper.Runtime",
+    "rootNamespace": "",
     "references": [
         "Unity.TextMeshPro",
-        "Abrusle.ScriptableSingleton"
+        "Abrusle.ScriptableSingleton",
+        "Abrusle.UnityCoroutween",
+        "Unity.SerializableDictionary"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

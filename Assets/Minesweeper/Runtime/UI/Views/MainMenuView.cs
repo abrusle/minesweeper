@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using Minesweeper.Runtime.Animation;
+using Minesweeper.Runtime.Data;
+using Minesweeper.Runtime.UI.MainMenu;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,12 +17,15 @@ namespace Minesweeper.Runtime.UI.Views
         [SerializeField] private Button quitButton;
         [SerializeField] private Button backButton;
         [SerializeField] private MainMenuAnimationStateMachine stateMachine;
+        [SerializeField] private MainMenuThemeMap themeMap;
+        [SerializeField] private ColorThemeApplier themeApplier;
 
         private Coroutine _animationWaitCoroutine;
 
         private void Start()
         {
             stateMachine.ResetState();
+            themeApplier.Theme = themeMap[stateMachine.CurrentState];
         }
 
         private void OnEnable()
@@ -68,6 +73,7 @@ namespace Minesweeper.Runtime.UI.Views
             {
                 var transitionClip = stateMachine.TransitionTo(state);
                 PlayAnimation(transitionClip);
+                themeApplier.Theme = themeMap[stateMachine.CurrentState];
             }
         }
 

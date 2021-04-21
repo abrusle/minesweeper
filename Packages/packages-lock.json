@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.azixmcaze.unityserializabledictionary": {
+      "version": "https://github.com/abrusle/Unity-SerializableDictionary.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "4d2250b67972734dd2520eaf4cd00947f0873c4f"
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
