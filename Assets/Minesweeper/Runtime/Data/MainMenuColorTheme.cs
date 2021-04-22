@@ -6,21 +6,24 @@ namespace Minesweeper.Runtime.Data
     public class MainMenuColorTheme : ScriptableObject
     {
         public Color Background => background;
-
-        public Color TileButtonHighlight => tileButtonHighlight;
-
-        public Color TileButtonNormal => tileButtonNormal;
+        
+        public ButtonColors TileButtons => tileButtons;
 
         public Color Text => text;
 
         public Color TitleTiles => titleTiles;
         
-        [SerializeField] private Color 
-            background,
-            tileButtonNormal,
-            tileButtonHighlight,
-            text,
-            titleTiles;
+        [SerializeField] private Color background;
+        [SerializeField] private ButtonColors tileButtons;
+        [Space(5)]
+        [SerializeField] private Color text;
+        [SerializeField] private Color titleTiles;
         
+        
+        [System.Serializable]
+        public struct ButtonColors
+        {
+            public Color normal, highlighted, selected, pressed, disabled;
+        }
     }
 }

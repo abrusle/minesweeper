@@ -48,11 +48,11 @@ namespace Minesweeper.Runtime.UI.MainMenu
 
             var buttonColors = new ButtonColorData
             {
-                normal = theme.TileButtonNormal,
-                highlighted = theme.TileButtonHighlight,
-                pressed = theme.TileButtonHighlight,
-                selected = theme.TileButtonHighlight,
-                disabled = theme.TileButtonNormal
+                normal = theme.TileButtons.normal,
+                highlighted = theme.TileButtons.highlighted,
+                pressed = theme.TileButtons.pressed,
+                selected = theme.TileButtons.selected,
+                disabled = theme.TileButtons.disabled
             };
             
             foreach (var buttonAnimator in targetComponents.tileButton)

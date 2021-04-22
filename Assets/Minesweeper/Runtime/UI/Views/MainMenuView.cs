@@ -66,15 +66,23 @@ namespace Minesweeper.Runtime.UI.Views
             SwitchState(MainMenuState.Classic);
         }
 
-        public void SwitchState(MainMenuState state)
+        public bool SwitchState(MainMenuState state)
         {
-            if (stateMachine.CurrentState == state) return;
-            if (stateMachine.CanTransitionTo(state))
-            {
-                var transitionClip = stateMachine.TransitionTo(state);
-                PlayAnimation(transitionClip);
-                themeApplier.Theme = themeMap[stateMachine.CurrentState];
-            }
+            if (stateMachine.CurrentState == state) return false;
+            if (!stateMachine.CanTransitionTo(state)) return false;
+            
+            var transitionClip = stateMachine.TransitionTo(state);
+            PlayAnimation(transitionClip);
+            themeApplier.Theme = themeMap[stateMachine.CurrentState];
+
+            backButton.interactable = state != MainMenuState.Default;
+            classicButton.interactable = state == MainMenuState.Default;
+            infiniteButton.interactable = state == MainMenuState.Default;
+            settingsButton.interactable = state == MainMenuState.Default;
+            quitButton.interactable = state == MainMenuState.Default;
+
+            return true;
+
         }
 
         private void PlayAnimation(AnimationClip clip)
