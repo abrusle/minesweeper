@@ -25,6 +25,7 @@ namespace Minesweeper.Runtime.UI.Views
         private void Start()
         {
             stateMachine.ResetState();
+            BroadcastStateChange(stateMachine.CurrentState, stateMachine.CurrentState);
             themeApplier.Theme = themeMap[stateMachine.CurrentState];
         }
 
@@ -70,7 +71,8 @@ namespace Minesweeper.Runtime.UI.Views
         {
             if (stateMachine.CurrentState == state) return false;
             if (!stateMachine.CanTransitionTo(state)) return false;
-            
+
+            var previousState = stateMachine.CurrentState;
             var transitionClip = stateMachine.TransitionTo(state);
             PlayAnimation(transitionClip);
             themeApplier.Theme = themeMap[stateMachine.CurrentState];
@@ -81,8 +83,9 @@ namespace Minesweeper.Runtime.UI.Views
             settingsButton.interactable = state == MainMenuState.Default;
             quitButton.interactable = state == MainMenuState.Default;
 
-            return true;
+            BroadcastStateChange(state, previousState);
 
+            return true;
         }
 
         private void PlayAnimation(AnimationClip clip)
@@ -129,6 +132,14 @@ namespace Minesweeper.Runtime.UI.Views
             #else
             Application.Quit();
             #endif
+        }
+
+        private void BroadcastStateChange(MainMenuState state, MainMenuState previousState)
+        {
+            foreach (var listener in GetComponentsInChildren<IMainMenuStateChangeListener>())
+            {
+                listener.OnMainMenuStateChange(previousState, state);
+            }
         }
     }
 }

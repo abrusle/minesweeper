@@ -5,7 +5,8 @@
         "Unity.TextMeshPro",
         "Abrusle.ScriptableSingleton",
         "Abrusle.UnityCoroutween",
-        "Unity.SerializableDictionary"
+        "Unity.SerializableDictionary",
+        "Abrusle.ScriptableDictionary"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

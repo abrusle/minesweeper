@@ -58,6 +58,13 @@
       "dependencies": {},
       "hash": "e09b40067eab6354210f1712edfe636909bce338"
     },
+    "net.abrusle.unity-scriptable.dictionary": {
+      "version": "https://github.com/abrusle/unity-scriptable-dictionary.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "99e632ed0b8a5373cb4287e55149bbc9194371ba"
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,
