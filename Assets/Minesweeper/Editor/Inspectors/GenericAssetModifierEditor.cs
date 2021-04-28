@@ -11,6 +11,11 @@ namespace Minesweeper.Editor.Inspectors
         where TAssetIn : Object
         where TAssetOut : Object
     {
+        private struct PropNames
+        {
+            // ReSharper disable InconsistentNaming
+            public const string source = "source", result = "result", assets = "assets";
+        }
         private struct Properties
         {
             public SerializedProperty
@@ -24,7 +29,7 @@ namespace Minesweeper.Editor.Inspectors
         {
             _properties = new Properties
             {
-                assetPairs = serializedObject.FindProperty("assets")
+                assetPairs = serializedObject.FindProperty(PropNames.assets)
             };
             _toRemove = new List<int>();
         }
@@ -60,6 +65,9 @@ namespace Minesweeper.Editor.Inspectors
                 if (GUILayout.Button("+", GUILayout.Width(50)))
                 {
                     _properties.assetPairs.AddEmptyArrayElement();
+                    var newPairProp = _properties.assetPairs.GetArrayElementAtIndex(_properties.assetPairs.arraySize - 1);
+                    newPairProp.FindPropertyRelative(PropNames.source).objectReferenceValue = null;
+                    newPairProp.FindPropertyRelative(PropNames.result).objectReferenceValue = null;
                     serializedObject.ApplyModifiedProperties();
                 }
             }
@@ -70,7 +78,7 @@ namespace Minesweeper.Editor.Inspectors
             foreach (int pairIndex in _toRemove)
             {
                 var pairProp = _properties.assetPairs.GetArrayElementAtIndex(pairIndex);
-                var srcProp = pairProp.FindPropertyRelative("source");
+                var srcProp = pairProp.FindPropertyRelative(PropNames.source);
                 srcProp.objectReferenceValue = null;
                 GenerateResultAssetForPair(pairProp);
                 _properties.assetPairs.DeleteArrayElementAtIndex(pairIndex);
@@ -86,7 +94,7 @@ namespace Minesweeper.Editor.Inspectors
             {
                 using (new VerticalScope(EditorStyles.helpBox))
                 {
-                    var sourceProp = prop.FindPropertyRelative("source");
+                    var sourceProp = prop.FindPropertyRelative(PropNames.source);
                     var initialValue = sourceProp.objectReferenceValue;
                     var newValue = ObjectField(new GUIContent("Source"), initialValue, typeof(TAssetIn), false);
                     if (initialValue != newValue)
@@ -96,7 +104,7 @@ namespace Minesweeper.Editor.Inspectors
                     }
 
                     using (new EditorGUI.DisabledGroupScope(true))
-                        PropertyField(prop.FindPropertyRelative("result"));
+                        PropertyField(prop.FindPropertyRelative(PropNames.result));
 
                     if (GUILayout.Button("Regenerate"))
                         GenerateResultAssetForPair(prop);
@@ -120,8 +128,8 @@ namespace Minesweeper.Editor.Inspectors
 
         private void GenerateResultAssetForPair(SerializedProperty pairProp)
         {
-            var srcProp = pairProp.FindPropertyRelative("source");
-            var resProp = pairProp.FindPropertyRelative("result");
+            var srcProp = pairProp.FindPropertyRelative(PropNames.source);
+            var resProp = pairProp.FindPropertyRelative(PropNames.result);
 
             TAssetIn srcAsset = srcProp.objectReferenceValue as TAssetIn;
             TAssetOut resAsset = resProp.objectReferenceValue as TAssetOut;
@@ -168,7 +176,7 @@ namespace Minesweeper.Editor.Inspectors
             {
                 resAssets[i] = _properties.assetPairs
                     .GetArrayElementAtIndex(i)
-                    .FindPropertyRelative("result")
+                    .FindPropertyRelative(PropNames.result)
                     .objectReferenceValue as TAssetOut;
             }
 

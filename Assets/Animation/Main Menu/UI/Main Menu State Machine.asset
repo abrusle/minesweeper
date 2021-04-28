@@ -18,6 +18,12 @@ MonoBehaviour:
     to: 1
   - from: 1
     to: 0
+  - from: 0
+    to: 2
+  - from: 2
+    to: 0
   transitionClips:
   - {fileID: 7400000, guid: f49d11cc336a17447acf804593f688fa, type: 2}
-  - {fileID: -6791543883584319732, guid: 92db16672d9c3484ba19c90822296a83, type: 2}
+  - {fileID: 4498951777521107224, guid: 61f4e18ac1adbec44b43cd4f4a8b3147, type: 2}
+  - {fileID: 7400000, guid: d398817f8bf944241ac30f2cf7cd2ff5, type: 2}
+  - {fileID: 9062228779818128730, guid: 61f4e18ac1adbec44b43cd4f4a8b3147, type: 2}
