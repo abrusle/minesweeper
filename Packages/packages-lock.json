@@ -54,11 +54,11 @@
       }
     },
     "net.abrusle.scriptable-singletons": {
-      "version": "https://github.com/abrusle/unity-scriptable-singletons.git#1.0.0",
+      "version": "https://github.com/abrusle/unity-scriptable-singletons.git",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "71b08928ab0e0af1aa7a4703f9c04930c05f940f"
+      "hash": "c20263bb0121099d3edfc174dd3ed53615e5a46f"
     },
     "net.abrusle.unity-coroutween": {
       "version": "https://github.com/abrusle/unity-coroutween.git",
