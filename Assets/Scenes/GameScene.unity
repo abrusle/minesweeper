@@ -1022,7 +1022,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 11400000, guid: 56deaa7d9ac84d345b99c0fd4a2507de, type: 2}
+      - m_Target: {fileID: 11400000, guid: e148d12a08eb6f040a183ca3dc3f2f35, type: 2}
         m_TargetAssemblyTypeName: Minesweeper.Runtime.SceneManager, Minesweeper.Runtime
         m_MethodName: SwitchToMainMenu
         m_Mode: 1

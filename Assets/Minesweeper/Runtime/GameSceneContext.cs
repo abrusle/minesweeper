@@ -88,14 +88,14 @@ namespace Minesweeper.Runtime
 
             if (_level.TryGetValue(cellPos, out var cell))
             {
+                if (cell.hasFlag)
+                    return;
+                
                 if (cell.hasMine)
                 {
                     OnGameOver();
                     return;
                 }
-                
-                if (cell.hasFlag)
-                    return;
             }
 
             var toReveal = new Dictionary<Vector2Int, Cell>();
