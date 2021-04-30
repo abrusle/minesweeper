@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Minesweeper.Runtime.Data;
-using Minesweeper.Runtime.Views;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace Minesweeper.Runtime
 {
+    using Data;
+    using Views;
+    
     public class GameSceneContext : SceneContext
     {
-        public Camera mainCamera;
+        public GameCameraClassic gameCamera;
         public LevelSettings levelSettings;
         public LevelGridView levelGridView;
         public GameUiView uiView;
@@ -35,8 +35,8 @@ namespace Minesweeper.Runtime
             _gameState = GameState.Running;
             cursor.positionMin = Vector2Int.zero;
             cursor.positionMax = levelSettings.size - Vector2Int.one;
-            levelGridView.OnGameStart(mainCamera);
-            mainCamera.orthographicSize = Mathf.Max(levelSettings.size.x, levelSettings.size.y) * .5f;
+            levelGridView.OnGameStart(gameCamera);
+            gameCamera.FitToLevel(levelSettings.size, levelGridView.Grid);
             uiView.OnMinesLeftCountChange(levelSettings.mineCount);
             levelGridView.DrawLevelGrid(levelSettings.size.x, levelSettings.size.y);
         }
@@ -57,7 +57,7 @@ namespace Minesweeper.Runtime
         {
             if (_gameState == GameState.Running)
             {
-                var worldPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+                var worldPoint = gameCamera.Camera.ScreenToWorldPoint(Input.mousePosition);
                 _cursorGridPos = (Vector2Int) levelGridView.Grid.WorldToCell(worldPoint);
                 cursor.UpdatePosition(_cursorGridPos);
             }
@@ -138,7 +138,7 @@ namespace Minesweeper.Runtime
         private void OnGameWon()
         {
             _gameState = GameState.Won;
-            levelGridView.DrawGameWon(mainCamera);
+            levelGridView.DrawGameWon(gameCamera);
 
             for (int x = 0; x < _level.GetLength(0); x++)
             {
@@ -154,7 +154,7 @@ namespace Minesweeper.Runtime
         private void OnGameOver()
         {
             _gameState = GameState.Over;
-            levelGridView.DrawGameOver(mainCamera);
+            levelGridView.DrawGameOver(gameCamera);
             
             for (int x = 0; x < _level.GetLength(0); x++)
             {

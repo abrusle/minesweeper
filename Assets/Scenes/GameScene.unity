@@ -596,6 +596,7 @@ GameObject:
   - component: {fileID: 519420032}
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
+  - component: {fileID: 519420030}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -611,6 +612,19 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_Enabled: 1
+--- !u!114 &519420030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78be3da69f3b4da39c041e8bec2fec5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  margin: {x: 1.1, y: 1.1}
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -638,7 +652,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 8.19
+  orthographic size: 5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -789,7 +803,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 320fc09a00a244c8b76f6e91dfa444e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainCamera: {fileID: 519420031}
+  gameCamera: {fileID: 519420030}
   levelSettings: {fileID: 11400000, guid: e2bbbae7fc1881246a6304a9a4609c14, type: 2}
   levelGridView: {fileID: 244594975}
   uiView: {fileID: 1145063447}

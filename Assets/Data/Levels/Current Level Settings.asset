@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fad9e739ff7404fbafbfeae4b0adee1, type: 3}
   m_Name: Current Level Settings
   m_EditorClassIdentifier: 
-  size: {x: 15, y: 12}
-  mineCount: 25
+  size: {x: 16, y: 21}
+  mineCount: 69

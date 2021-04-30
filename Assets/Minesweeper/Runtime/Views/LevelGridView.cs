@@ -1,9 +1,9 @@
-﻿using System;
-using Minesweeper.Runtime.Views.Animation;
-using UnityEngine;
+﻿using UnityEngine;
+
 namespace Minesweeper.Runtime.Views
 {
     using Data;
+    using Animation;
     
     [RequireComponent(typeof(Grid))]
     public class LevelGridView : MonoBehaviour
