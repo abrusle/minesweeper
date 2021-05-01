@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Minesweeper.Runtime.Data;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Minesweeper.Runtime
@@ -15,13 +16,23 @@ namespace Minesweeper.Runtime
             GameInfinite = 2
         }
 
+        [SerializeField] private SerializableDictionary<SceneId, SceneSettings> sceneSettings;
+
         public void SwitchToGameClassic() => SwitchScene(SceneId.GameClassic);
         public void SwitchToMainMenu() => SwitchScene(SceneId.MainMenu);
         public void SwitchToGameInfinite() => SwitchScene(SceneId.GameInfinite);
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void OnApplicationLoad()
+        {
+            var currentScene = (SceneId) GetActiveScene().buildIndex;
+            Instance.sceneSettings[currentScene].ApplyNow();
+        }
         
         public void SwitchScene(SceneId sceneId)
         {
             LoadScene((int) sceneId, LoadSceneMode.Single);
+            sceneSettings[sceneId].ApplyNow();
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Minesweeper.Runtime.Animation.UI
         
         public void PlayAnimation(TValue from, TValue to, float duration, AnimationCurve ease = null)
         {
-            if (_tween is {IsPlaying: true})
+            if (_tween != null && _tween.IsPlaying)
                 _tween.Stop();
 
             _tween = new Tween(this,
@@ -45,7 +45,7 @@ namespace Minesweeper.Runtime.Animation.UI
 
         public void StopAnimation()
         {
-            if (_tween is {IsPlaying: true})
+            if (_tween != null && _tween.IsPlaying)
             {
                 _tween.Stop();
                 _tween = null;

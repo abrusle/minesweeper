@@ -12,3 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff7695d4f70b41e4b13f98e9d09eb3a3, type: 3}
   m_Name: SceneManager
   m_EditorClassIdentifier: 
+  sceneSettings:
+    m_keys: 000000000100000002000000
+    m_values:
+    - {fileID: 11400000, guid: 91aab2b5cbce0f04382a2c57937bc91d, type: 2}
+    - {fileID: 11400000, guid: fde1b06f5007c4441a62bac49e3716f4, type: 2}
+    - {fileID: 11400000, guid: fde1b06f5007c4441a62bac49e3716f4, type: 2}

@@ -70,13 +70,13 @@ namespace Minesweeper.Runtime.UI.Views
             {
                 parsedInt = 1;
             }
-            targetLevelSettings.size.x = parsedInt;
+            targetLevelSettings.size.y = parsedInt;
             
             if (!int.TryParse(columnCountField.text, out parsedInt))
             {
                 parsedInt = 1;
             }
-            targetLevelSettings.size.y = parsedInt;
+            targetLevelSettings.size.x = parsedInt;
             
             SceneManager.Instance.SwitchScene(SceneManager.SceneId.GameClassic);
         }
