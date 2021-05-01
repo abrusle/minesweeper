@@ -9,8 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8923dfe957dd4a23b30091bdacbb6bd9, type: 3}
-  m_Name: Noise Sampler
+  m_Script: {fileID: 11500000, guid: 2ae4b384a59b4c718cb954807608dbfe, type: 3}
+  m_Name: Application Presenter
   m_EditorClassIdentifier: 
-  minValue: 3
-  maxValue: 26

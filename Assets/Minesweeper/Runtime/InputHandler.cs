@@ -5,7 +5,7 @@ namespace Minesweeper.Runtime
 {
     public class InputHandler : MonoBehaviour
     {
-        public static event Action LeftClick, RightClick;
+        public static event Action LeftClick, RightClick, FullScreenToggle;
         
         private static InputHandler _Instance;
 
@@ -39,6 +39,11 @@ namespace Minesweeper.Runtime
             if (Input.GetMouseButtonUp(1))
             {
                 RightClick?.Invoke();
+            }
+
+            if (Input.GetKeyUp(KeyCode.F11))
+            {
+                FullScreenToggle?.Invoke();
             }
         }
     }
