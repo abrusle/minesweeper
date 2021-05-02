@@ -43,12 +43,17 @@ namespace Minesweeper.Runtime.Views
 
         public void FlagCell(int x, int y)
         {
-            _cellViews[x,y].backgroundSprite.color = new Color(1f, 0.94f, 0.51f);
+            var cellView = _cellViews[x,y];
+            cellView.backgroundSprite.color = new Color(1f, 0.94f, 0.51f);
+            cellView.FlagColor = new Color(0.43f, 0.36f, 0.15f);
+            cellView.flagView.SetActive(true);
         }
 
         public void UnflagCell(int x, int y)
         {
-            _cellViews[x,y].backgroundSprite.color = colorSheet.unrevealedColor;
+            var cellView = _cellViews[x,y];
+            cellView.backgroundSprite.color = colorSheet.unrevealedColor;
+            cellView.flagView.SetActive(false);
         }
 
         public void Clear()

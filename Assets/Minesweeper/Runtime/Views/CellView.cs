@@ -9,5 +9,19 @@ namespace Minesweeper.Runtime.Views
         public TextMeshPro textMesh;
         [FormerlySerializedAs("maskingSprite")]
         public SpriteRenderer backgroundSprite;
+
+        public GameObject flagView;
+
+        public Color FlagColor
+        {
+            set
+            {
+                var flagSprites = flagView.GetComponentsInChildren<SpriteRenderer>(true);
+                foreach (var flagSprite in flagSprites)
+                {
+                    flagSprite.color = value;
+                }
+            }
+        }
     }
 }
