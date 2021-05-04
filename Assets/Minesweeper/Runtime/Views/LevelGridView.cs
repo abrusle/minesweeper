@@ -44,16 +44,17 @@ namespace Minesweeper.Runtime.Views
         public void FlagCell(int x, int y)
         {
             var cellView = _cellViews[x,y];
-            cellView.backgroundSprite.color = new Color(1f, 0.94f, 0.51f);
-            cellView.FlagColor = new Color(0.43f, 0.36f, 0.15f);
-            cellView.flagView.SetActive(true);
+            cellView.backgroundSprite.color = colorSheet.flaggedCellColor; //new Color(1f, 0.94f, 0.51f);
+            cellView.FlagColor = colorSheet.flagColor; //new Color(0.43f, 0.36f, 0.15f);
+            cellView.ToggleFlag(true);
         }
 
         public void UnflagCell(int x, int y)
         {
             var cellView = _cellViews[x,y];
-            cellView.backgroundSprite.color = colorSheet.unrevealedColor;
-            cellView.flagView.SetActive(false);
+            cellView.backgroundSprite.color = colorSheet.unrevealedCellColor;
+            cellView.FlagColor = colorSheet.GetColor(0);
+            cellView.ToggleFlag(false);
         }
 
         public void Clear()
@@ -87,7 +88,7 @@ namespace Minesweeper.Runtime.Views
                     _cellViews[x, y] = cellView;
                     cellView.textMesh.text = string.Empty;
                     cellView.textMesh.enabled = false;
-                    cellView.backgroundSprite.color = colorSheet.unrevealedColor;
+                    cellView.backgroundSprite.color = colorSheet.unrevealedCellColor;
                 }
             }
             
@@ -132,7 +133,7 @@ namespace Minesweeper.Runtime.Views
                 cellView.textMesh.enabled = true;
             }
 
-            cellView.backgroundSprite.color = colorSheet.revealedColor;
+            cellView.backgroundSprite.color = colorSheet.revealedCellColor;
         }
 
         private readonly struct RevealAnimationDatum

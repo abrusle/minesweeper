@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Minesweeper.Runtime.Data
 {
@@ -11,8 +12,10 @@ namespace Minesweeper.Runtime.Data
         public ColorRule[] rules;
         [Space]
         public Color mineColor;
-        public Color unrevealedColor;
-        public Color revealedColor;
+        [FormerlySerializedAs("unrevealedColor")] public Color unrevealedCellColor;
+        [FormerlySerializedAs("revealedColor")] public Color revealedCellColor;
+        public Color flaggedCellColor;
+        public Color flagColor;
         
         [Header("World")]
         public Color bgColor;

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 12f67f5d7edf4c818f4aadc85d7156e3, type: 3}
-  m_Name: Test Cell Color Sheet
+  m_Name: Level Color Sheet
   m_EditorClassIdentifier: 
   rules:
   - threshold: 0
@@ -23,9 +23,11 @@ MonoBehaviour:
     color: {r: 1, g: 0.19994353, b: 0.18396229, a: 1}
   - threshold: 4
     color: {r: 0.6886792, g: 0, b: 0.11384615, a: 1}
-  mineColor: {r: 0, g: 0, b: 0, a: 1}
-  unrevealedColor: {r: 0, g: 0.30588236, b: 0.34901962, a: 1}
-  revealedColor: {r: 0, g: 0.4392157, b: 0.42352942, a: 1}
-  bgColor: {r: 0, g: 0.19607843, b: 0.24705882, a: 1}
-  gameOverBgColor: {r: 0.24705882, g: 0, b: 0.056385294, a: 1}
-  gameWonBgColor: {r: 0.13493617, g: 0.24705882, b: 0, a: 1}
+  mineColor: {r: 0.12100001, g: 0.12100001, b: 0.12100001, a: 1}
+  unrevealedCellColor: {r: 0, g: 0.30588236, b: 0.34901962, a: 1}
+  revealedCellColor: {r: 0, g: 0.4392157, b: 0.42352942, a: 1}
+  flaggedCellColor: {r: 1, g: 0.91013074, b: 0.50980395, a: 1}
+  flagColor: {r: 0.54901963, g: 0.34532583, b: 0.13725491, a: 1}
+  bgColor: {r: 0.052623544, g: 0.20693727, b: 0.24705882, a: 1}
+  gameOverBgColor: {r: 0.24705882, g: 0.056082353, b: 0.11064703, a: 1}
+  gameWonBgColor: {r: 0.112164706, g: 0.24705882, b: 0.1507552, a: 1}

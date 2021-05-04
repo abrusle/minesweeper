@@ -471,7 +471,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textMesh: {fileID: 4434073017088779609}
   backgroundSprite: {fileID: 4434073018409485307}
-  flagView: {fileID: 8892480632129437754}
+  flagAnimator: {fileID: 4441377350907751439}
 --- !u!61 &2057815821008521107
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -507,14 +507,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8466278706900857501}
-  - component: {fileID: 1628006220653119984}
+  - component: {fileID: 4441377350907751439}
   m_Layer: 0
   m_Name: Flag
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8466278706900857501
 Transform:
   m_ObjectHideFlags: 0
@@ -530,19 +530,22 @@ Transform:
   m_Father: {fileID: 4434073018627514976}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!111 &1628006220653119984
-Animation:
+--- !u!95 &4441377350907751439
+Animator:
+  serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8892480632129437754}
   m_Enabled: 1
-  serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: 2a2f70ce8a97f3d47b0df9d98994c45a, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 2a2f70ce8a97f3d47b0df9d98994c45a, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
-  m_CullingType: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d3aaa09c7807bd443a681934ec5336ca, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0

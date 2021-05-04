@@ -20,6 +20,7 @@ namespace Minesweeper.Runtime.Views
         public bool animate = true;
         [FormerlySerializedAs("durationMult")]
         [Min(0.01f)] public float durationMultiplier = 1;
+        public AnimationCurve ease = AnimationCurve.EaseInOut(0, 0, 1, 1);
         
         [NonSerialized]
         public Vector2Int positionMin, positionMax;
@@ -32,7 +33,6 @@ namespace Minesweeper.Runtime.Views
         {
             if (cellAtCursor == _currentPosition) return;
 
-            var previous = _currentPosition;
             _currentPosition = cellAtCursor;
             if (cellAtCursor.x < positionMin.x ||
                 cellAtCursor.y < positionMin.y ||
@@ -53,7 +53,7 @@ namespace Minesweeper.Runtime.Views
 
         private void HideHighlight()
         {
-            if (_isVisible != false)
+            if (_isVisible)
                 gameObject.SetActive(_isVisible = false);
         }
 
@@ -80,7 +80,7 @@ namespace Minesweeper.Runtime.Views
 
             for (float t = 0; t < 1; t += Time.deltaTime * durationMultiplier)
             {
-                transform.position = Vector3.Lerp(from, to, t);
+                transform.position = Vector3.Lerp(from, to, ease.Evaluate(t));
                 yield return null;
             }
 
