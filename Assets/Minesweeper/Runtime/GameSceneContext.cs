@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Minesweeper.Runtime
 {
@@ -14,12 +14,11 @@ namespace Minesweeper.Runtime
         public LevelSettings levelSettings;
         public LevelGridView levelGridView;
         public GameUiView uiView;
-        [FormerlySerializedAs("hoverIndicator")] public CursorView cursor;
-        
+        public CursorView cursor;
+
         private Cell[,] _level;
         private int _emptyCellsLeft;
         private GameState _gameState;
-        private Vector2Int _cursorGridPos;
         private int _flagCount;
 
         private enum GameState
@@ -43,30 +42,56 @@ namespace Minesweeper.Runtime
         
         private void OnEnable()
         {
-            InputHandler.LeftClick += OnLeftClick;
-            InputHandler.RightClick += OnRightClick;
+            InputHandler.MouseLeftUp += OnLeftClick;
+            InputHandler.MouseRightUp += OnRightClick;
+            InputHandler.MouseLeftDown += OnMouseLeftDown;
+            cursor.OnHighlightedCellChanged.AddListener(OnCursorSelectionChanged);
+        }
+
+        private Vector2Int? _lastSelected;
+
+        private void OnMouseLeftDown()
+        {
+            if (_gameState != GameState.Running) return;
+            Vector2Int cellPos = cursor.CurrentPosition;
+
+            if (_level != null && _level.Length != 0) return;
+            
+            if (cellPos.x < 0 || cellPos.x >= levelSettings.size.x || 
+                cellPos.y < 0 || cellPos.y >= levelSettings.size.y) 
+                return;
+
+            if (!_level.TryGetValue(cellPos, out Cell cell))
+                return;
+            
+            if (cell.isRevealed)
+                return;
+            
+            _lastSelected = cellPos;
+            levelGridView.SelectCell(cellPos.x, cellPos.y);
+            
         }
 
         private void OnDisable()
         {
-            InputHandler.LeftClick -= OnLeftClick;
-            InputHandler.RightClick -= OnRightClick;
+            InputHandler.MouseLeftUp -= OnLeftClick;
+            InputHandler.MouseRightUp -= OnRightClick;
+            cursor.OnHighlightedCellChanged.RemoveListener(OnCursorSelectionChanged);
         }
-
-        private void Update()
+        
+        private void OnCursorSelectionChanged()
         {
-            if (_gameState == GameState.Running)
+            if (_lastSelected != null)
             {
-                var worldPoint = gameCamera.Camera.ScreenToWorldPoint(Input.mousePosition);
-                _cursorGridPos = (Vector2Int) levelGridView.Grid.WorldToCell(worldPoint);
-                cursor.UpdatePosition(_cursorGridPos);
+                levelGridView.UnSelectCell(_lastSelected.Value.x, _lastSelected.Value.y);
+                _lastSelected = null;
             }
         }
 
         private void OnLeftClick()
         {
             if (_gameState != GameState.Running) return;
-            var cellPos = _cursorGridPos;
+            var cellPos = cursor.CurrentPosition;
 
             if (_level == null || _level.Length == 0)
             {
@@ -115,7 +140,7 @@ namespace Minesweeper.Runtime
         {
             if (_gameState != GameState.Running) return;
             if (_level == null || _level.Length == 0) return;
-            var cellPos = _cursorGridPos;
+            var cellPos = cursor.CurrentPosition;
 
             if (_level.TryGetValue(cellPos, out var cell) && !cell.isRevealed)
             {

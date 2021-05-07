@@ -44,5 +44,11 @@ namespace Minesweeper.Runtime.Views
                     flagSprite.color = value;
             }
         }
+
+        public bool Selected
+        {
+            // get;
+            set => transform.localScale = Vector3.one * (value ? 0.9f : 1.0f);
+        }
     }
 }

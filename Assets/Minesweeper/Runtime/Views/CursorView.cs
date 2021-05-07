@@ -2,12 +2,17 @@
 using System.Collections;
 using Minesweeper.Runtime.Data;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Serialization;
 
 namespace Minesweeper.Runtime.Views
 {
     public class CursorView : MonoBehaviour
     {
+        public UnityEvent OnHighlightedCellChanged => onHighlightedCellChanged;
+        
+        public Vector2Int CurrentPosition { get; private set; } = new Vector2Int(int.MinValue, int.MinValue);
+        
         [Header("Scene Dependencies")]
         public Grid grid;
         
@@ -21,23 +26,32 @@ namespace Minesweeper.Runtime.Views
         [FormerlySerializedAs("durationMult")]
         [Min(0.01f)] public float durationMultiplier = 1;
         public AnimationCurve ease = AnimationCurve.EaseInOut(0, 0, 1, 1);
+
+        [SerializeField, Space] private UnityEvent onHighlightedCellChanged;
+        
         
         [NonSerialized]
         public Vector2Int positionMin, positionMax;
-
-        private Vector2Int _currentPosition = new Vector2Int(int.MinValue, int.MinValue);
+        
         private bool _isVisible;
         private Coroutine _transitionCoroutine;
-
-        public void UpdatePosition(Vector2Int cellAtCursor)
+        
+        private void Update()
         {
-            if (cellAtCursor == _currentPosition) return;
+            Vector2Int cellAtCursor = (Vector2Int) grid.WorldToCell(InputHandler.MousePositionWorld);
+            UpdatePosition(cellAtCursor);
+        }
 
-            _currentPosition = cellAtCursor;
-            if (cellAtCursor.x < positionMin.x ||
+        private void UpdatePosition(Vector2Int cellAtCursor)
+        {
+            if (cellAtCursor == CurrentPosition) return;
+
+            CurrentPosition = cellAtCursor;
+            if ((cellAtCursor.x < positionMin.x ||
                 cellAtCursor.y < positionMin.y ||
                 cellAtCursor.x > positionMax.x ||
                 cellAtCursor.y > positionMax.y)
+                && _isVisible)
             {
                 CursorUtility.SetCursor(normalCursor);
                 HideHighlight();
@@ -47,7 +61,11 @@ namespace Minesweeper.Runtime.Views
                 CursorUtility.SetCursor(pointerCursor);
                 ShowHighlight();
             }
-            else TransitionHighlight(_currentPosition);
+            else
+            {
+                onHighlightedCellChanged.Invoke();
+                TransitionHighlight(CurrentPosition);
+            }
             
         }
 
@@ -60,7 +78,7 @@ namespace Minesweeper.Runtime.Views
         private void ShowHighlight()
         {
             gameObject.SetActive(_isVisible = true);
-            transform.position = CellToWorld(_currentPosition);
+            transform.position = CellToWorld(CurrentPosition);
         }
 
         private void TransitionHighlight(Vector2Int to)

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Minesweeper.Runtime.Views
 {
@@ -14,7 +15,6 @@ namespace Minesweeper.Runtime.Views
         [SerializeField] private ColorSheet colorSheet;
         [SerializeField, Min(0)] private int revealAnimationInterval;
         
-
         private CellView[,] _cellViews;
         private AnimationSequence<RevealAnimationDatum> _revealSequence;
 
@@ -31,7 +31,7 @@ namespace Minesweeper.Runtime.Views
         {
             _revealSequence.Dispose();
         }
-
+        
         public void RevealCell(Cell cell, int x, int y, bool animated = true)
         {
             var datum = new RevealAnimationDatum(cell, x, y);
@@ -55,6 +55,16 @@ namespace Minesweeper.Runtime.Views
             cellView.backgroundSprite.color = colorSheet.unrevealedCellColor;
             cellView.FlagColor = colorSheet.GetColor(0);
             cellView.ToggleFlag(false);
+        }
+
+        public void SelectCell(int x,  int y)
+        {
+            _cellViews[x, y].Selected = true;
+        }
+
+        public void UnSelectCell(int x, int y)
+        {
+            _cellViews[x, y].Selected = false;
         }
 
         public void Clear()
@@ -119,6 +129,7 @@ namespace Minesweeper.Runtime.Views
         private void PlayRevealAnimation(RevealAnimationDatum datum)
         {
             var cellView = _cellViews[datum.x, datum.y];
+            cellView.Selected = false;
             if (datum.cell.value != 0)
             {
                 cellView.textMesh.text = datum.cell.hasMine ? "*" : datum.cell.value.ToString();

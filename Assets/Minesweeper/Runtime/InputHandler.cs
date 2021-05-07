@@ -5,9 +5,22 @@ namespace Minesweeper.Runtime
 {
     public class InputHandler : MonoBehaviour
     {
-        public static event Action LeftClick, RightClick, FullScreenToggle;
+        public static event Action
+            MouseLeftUp,
+            MouseRightUp,
+            MouseLeftDown,
+            MouseRightDown,
+            FullScreenToggle;
+        
+
+        public static Vector3 MousePositionWorld
+        {
+            get => _Instance._cachedMousePositionWorld 
+                   ?? (_Instance._cachedMousePositionWorld = _Instance.GetMousePositionWorld()).Value;
+        }
         
         private static InputHandler _Instance;
+        private Vector3? _cachedMousePositionWorld;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Init()
@@ -32,19 +45,27 @@ namespace Minesweeper.Runtime
         private void Update()
         {
             if (Input.GetMouseButtonUp(0))
-            {
-                LeftClick?.Invoke();
-            }
+                MouseLeftUp?.Invoke();
+            else if (Input.GetMouseButtonDown(0))
+                MouseLeftDown?.Invoke();
 
             if (Input.GetMouseButtonUp(1))
-            {
-                RightClick?.Invoke();
-            }
+                MouseRightUp?.Invoke();
+            else if (Input.GetMouseButtonDown(1))
+                MouseRightDown?.Invoke();
 
             if (Input.GetKeyUp(KeyCode.F11))
-            {
                 FullScreenToggle?.Invoke();
-            }
+        }
+
+        private void LateUpdate()
+        {
+            _cachedMousePositionWorld = null;
+        }
+
+        private Vector3 GetMousePositionWorld()
+        {
+            return MainCamera.Instance.Camera.ScreenToWorldPoint(Input.mousePosition);
         }
     }
 }

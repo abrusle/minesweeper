@@ -3,20 +3,9 @@
 namespace Minesweeper.Runtime
 {
     [RequireComponent(typeof(Camera))]
-    public class GameCameraClassic : MonoBehaviour
+    public class GameCameraClassic : MainCamera
     {
-        public Camera Camera => _camera;
-
-
         [SerializeField] private Vector2 margin;
-        
-        
-        private Camera _camera;
-
-        private void Awake()
-        {
-            _camera = GetComponent<Camera>();
-        }
 
         public void FitToLevel(Vector2 levelSize, Grid grid)
         {
@@ -32,12 +21,7 @@ namespace Minesweeper.Runtime
             if (screenAspect < levelAspect)
                 orthoSize *= levelAspect / screenAspect;
 
-            _camera.orthographicSize = orthoSize * 0.5f;
-        }
-
-        public static implicit operator Camera(GameCameraClassic classic)
-        {
-            return classic.Camera;
+            Camera.orthographicSize = orthoSize * 0.5f;
         }
     }
 }
