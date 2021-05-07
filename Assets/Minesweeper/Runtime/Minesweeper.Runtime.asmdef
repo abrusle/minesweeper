@@ -6,7 +6,8 @@
         "Abrusle.ScriptableSingleton",
         "Abrusle.UnityCoroutween",
         "Unity.SerializableDictionary",
-        "Abrusle.ScriptableDictionary"
+        "Abrusle.ScriptableDictionary",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

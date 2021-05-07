@@ -1,0 +1,109 @@
+{
+    "name": "Input Actions",
+    "maps": [
+        {
+            "name": "InGame",
+            "id": "d9435197-8906-425a-9faf-48874febfb20",
+            "actions": [
+                {
+                    "name": "Click Primary",
+                    "type": "Value",
+                    "id": "a5b27427-c562-4fa4-884c-5f768fbc0943",
+                    "expectedControlType": "Digital",
+                    "processors": "",
+                    "interactions": "Press(behavior=2)"
+                },
+                {
+                    "name": "Click Secondary",
+                    "type": "Value",
+                    "id": "cbe77111-4fce-495c-8cc3-90252120139b",
+                    "expectedControlType": "Digital",
+                    "processors": "",
+                    "interactions": "Press(behavior=2)"
+                },
+                {
+                    "name": "Free Cursor Position",
+                    "type": "Value",
+                    "id": "cc4ded1b-744a-4ac4-bf0c-78518143d0fb",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Cancel",
+                    "type": "Button",
+                    "id": "499f8b6e-254c-4847-a6c0-cfd301cf8850",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "FullScreenToggle",
+                    "type": "Button",
+                    "id": "8590260c-9e82-42f1-b804-a1ac199f3146",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "08e472c9-0038-4d02-ada3-93e0be6b121a",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Click Primary",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fdbfade2-302d-49e7-9094-ff6d711031dc",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Click Secondary",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8a9bc16c-174c-422d-a3f2-11411e0c5e20",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Free Cursor Position",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "91388045-df68-4d0c-9a92-341da5d4d465",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "Press(behavior=1)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Cancel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c635aa85-2ed6-46d3-9572-310edd73e7e2",
+                    "path": "<Keyboard>/f11",
+                    "interactions": "Press(behavior=1)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "FullScreenToggle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
