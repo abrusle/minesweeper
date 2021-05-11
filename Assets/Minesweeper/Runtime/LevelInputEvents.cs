@@ -1,100 +1,138 @@
-﻿using UnityEngine;
+﻿using System;
+using Minesweeper.Runtime.Data;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace Minesweeper.Runtime
 {
     public class LevelInputEvents : InputSystemInterpreter
     {
-        [SerializeField] private new Camera camera;
-        [SerializeField] private Grid levelGrid;
-
         /// <summary>
         /// Invoked when the mouse hovers over a new cell.
         /// </summary>
+        public UnityEvent<Vector2Int?> OnCellHovered => onCellHovered;
+
+        public IClickEventEmitter NormalClick => normalClick;
+        
+        public IClickEventEmitter SpecialClick => specialClick;
+        
+        [SerializeField] private new Camera camera;
+        [SerializeField] private Grid levelGrid;
+        [SerializeField] private LevelSettings levelSettings;
+        
+
         [Space]
         [SerializeField, Tooltip("Invoked when the mouse hovers over a new cell.")]
         private UnityEvent<Vector2Int?> onCellHovered;
 
-        /// <summary>
-        /// Invoked when the mouse button is pressed down.
-        /// </summary>
-        [SerializeField, Tooltip("Invoked when the mouse button is pressed down.")]
-        private UnityEvent<Vector2Int> onCellSelected;
-        
-        /// <summary>
-        /// Invoked when the mouse button is released.
-        /// </summary>
-        [SerializeField, Tooltip("Invoked when the mouse button is released.")]
-        private UnityEvent<Vector2Int> onCellDeselected;
-
-        /// <summary>
-        /// Invoked when a cell is clicked.
-        /// </summary>
-        [SerializeField, Tooltip("Invoked when a cell is clicked.")]
-        private UnityEvent<Vector2Int> onCellClicked;
-
-        /// <summary>
-        /// Invoked when the mouse button is pressed down.
-        /// </summary>
-        [SerializeField, Tooltip("Invoked when the mouse button is pressed down.")]
-        private UnityEvent<Vector2Int> onBeforeSpecialClick;
-        
-        /// <summary>
-        /// Invoked when the mouse button is pressed down.
-        /// </summary>
-        [SerializeField, Tooltip("Invoked when the mouse button is pressed down.")]
-        private UnityEvent<Vector2Int> onSpecialClick;
-
         private Vector2Int _currentCursorGridPos;
-        private Vector2Int? _selectedCell, _specialSelectedCell;
-        
-        // TODO take level bounds into account
-        // TODO handle cursor leaving window
+        private bool _currentlyWithinLevelBounds;
+
+        [SerializeField] private ClickTracker normalClick, specialClick;
+
         // TODO add ESC key to cancel selection
-        // TODO check both clicks pressed at the same time.
 
         /// <inheritdoc />
         protected override void Update()
         {
             base.Update();
+            // TODO handle cursor leaving and entering window
             var newCursorPos = (Vector2Int) levelGrid.WorldToCell(camera.ScreenToWorldPoint(FreeCursorPosition));
             if (newCursorPos != _currentCursorGridPos)
             {
+                bool withinLevelBounds = LevelUtility.IsCellWithinBounds(newCursorPos, levelSettings.size);
                 _currentCursorGridPos = newCursorPos;
-                onCellHovered.Invoke(_currentCursorGridPos);
-                
-                if (_selectedCell != null && _selectedCell.Value != newCursorPos)
-                {
-                    onCellDeselected.Invoke(_selectedCell.Value);
-                    _selectedCell = null;
-                }
+                normalClick.currentCursorGridPos = specialClick.currentCursorGridPos = _currentCursorGridPos;
+                if (_currentlyWithinLevelBounds || withinLevelBounds)
+                    onCellHovered.Invoke(withinLevelBounds ? _currentCursorGridPos : (Vector2Int?) null);
+
+                _currentlyWithinLevelBounds = withinLevelBounds;
+
+                normalClick.OnCellHovered(_currentCursorGridPos);
+                specialClick.OnCellHovered(_currentCursorGridPos);
             }
         }
 
         /// <inheritdoc />
         protected override void OnClickPrimary(bool pressed)
         {
-            if (pressed) // button pressed
-            {
-                onCellSelected.Invoke(_currentCursorGridPos);
-                _selectedCell = _currentCursorGridPos;
-            }
-            else if (_selectedCell != null)// button released
-            {
-                if (_selectedCell.Value == _currentCursorGridPos)
-                {
-                    onCellClicked.Invoke(_currentCursorGridPos);
-                }
-
-                onCellDeselected.Invoke(_selectedCell.Value);
-                _selectedCell = null;
-            }
+            if (CanEmitEvents() == false)
+                return;
+            
+            if (pressed)
+                normalClick.OnPress();
+            else
+                normalClick.OnRelease();
         }
 
         /// <inheritdoc />
         protected override void OnClickSecondary(bool pressed)
         {
-            // same behavior as primary click but with different events and selectedCell.
+            if (CanEmitEvents() == false)
+                return;
+
+            if (pressed)
+                specialClick.OnPress();
+            else
+                specialClick.OnRelease();
+        }
+
+        private bool CanEmitEvents()
+        {
+            return LevelUtility.IsCellWithinBounds(_currentCursorGridPos, levelSettings.size);
+            // TODO check if click is over a UI object.
+        }
+
+        public interface IClickEventEmitter
+        {
+            UnityEvent<Vector2Int> OnSelected { get; }
+            UnityEvent<Vector2Int> OnClicked { get; }
+            UnityEvent<Vector2Int> OnDeselected { get; }
+        }
+
+        [Serializable]
+        private class ClickTracker : IClickEventEmitter
+        {
+            public UnityEvent<Vector2Int> OnSelected => onSelected;
+            public UnityEvent<Vector2Int> OnClicked => onClicked;
+            public UnityEvent<Vector2Int> OnDeselected => onDeselected;
+            
+            [NonSerialized]
+            public Vector2Int currentCursorGridPos;
+            
+            [SerializeField] private UnityEvent<Vector2Int> onSelected;
+            [SerializeField] private UnityEvent<Vector2Int> onClicked;
+            [SerializeField] private UnityEvent<Vector2Int> onDeselected;
+            
+            private Vector2Int? _selectedCell;
+
+            public void OnCellHovered(Vector2Int hoverCell)
+            {
+                if (_selectedCell != null && _selectedCell.Value != hoverCell)
+                {
+                    onDeselected?.Invoke(_selectedCell.Value);
+                    _selectedCell = null;
+                }
+            }
+
+            public void OnPress()
+            {
+                onSelected?.Invoke(currentCursorGridPos);
+                _selectedCell = currentCursorGridPos;
+            }
+
+            public void OnRelease()
+            {
+                if (_selectedCell == null) return;
+
+                if (_selectedCell.Value == currentCursorGridPos)
+                {
+                    onClicked?.Invoke(currentCursorGridPos);
+                }
+                
+                onDeselected?.Invoke(currentCursorGridPos);
+                _selectedCell = null;
+            }
         }
     }
 }

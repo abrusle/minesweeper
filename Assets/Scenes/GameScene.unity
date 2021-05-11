@@ -319,6 +319,77 @@ Grid:
   m_CellGap: {x: 0.08, y: 0.08, z: 0.08}
   m_CellLayout: 0
   m_CellSwizzle: 0
+--- !u!1 &257095320
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 257095323}
+  - component: {fileID: 257095322}
+  m_Layer: 0
+  m_Name: Level Events
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &257095322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 257095320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fc8abef710044bb84a1de66a6071216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputActionAsset: {fileID: -944628639613478452, guid: 7a17d623ec7b20f4aa69a3197c4d1a79,
+    type: 3}
+  camera: {fileID: 519420031}
+  levelGrid: {fileID: 244594977}
+  levelSettings: {fileID: 11400000, guid: e2bbbae7fc1881246a6304a9a4609c14, type: 2}
+  onCellHovered:
+    m_PersistentCalls:
+      m_Calls: []
+  normalClick:
+    onSelected:
+      m_PersistentCalls:
+        m_Calls: []
+    onClicked:
+      m_PersistentCalls:
+        m_Calls: []
+    onDeselected:
+      m_PersistentCalls:
+        m_Calls: []
+  specialClick:
+    onSelected:
+      m_PersistentCalls:
+        m_Calls: []
+    onClicked:
+      m_PersistentCalls:
+        m_Calls: []
+    onDeselected:
+      m_PersistentCalls:
+        m_Calls: []
+--- !u!4 &257095323
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 257095320}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &300671574
 GameObject:
   m_ObjectHideFlags: 0
@@ -772,7 +843,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1121186882}
   - component: {fileID: 1121186883}
-  - component: {fileID: 1121186884}
   m_Layer: 0
   m_Name: Scene Context
   m_TagString: Untagged
@@ -811,40 +881,6 @@ MonoBehaviour:
   levelGridView: {fileID: 244594975}
   uiView: {fileID: 1145063447}
   cursor: {fileID: 1149368403}
---- !u!114 &1121186884
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1121186881}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1fc8abef710044bb84a1de66a6071216, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  inputActionAsset: {fileID: -944628639613478452, guid: 7a17d623ec7b20f4aa69a3197c4d1a79,
-    type: 3}
-  camera: {fileID: 519420031}
-  levelGrid: {fileID: 244594977}
-  onCellHovered:
-    m_PersistentCalls:
-      m_Calls: []
-  onCellSelected:
-    m_PersistentCalls:
-      m_Calls: []
-  onCellDeselected:
-    m_PersistentCalls:
-      m_Calls: []
-  onCellClicked:
-    m_PersistentCalls:
-      m_Calls: []
-  onBeforeSpecialClick:
-    m_PersistentCalls:
-      m_Calls: []
-  onSpecialClick:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &1145063446
 GameObject:
   m_ObjectHideFlags: 0

@@ -9,6 +9,7 @@ namespace Minesweeper.Runtime
 
         private InputActionMap _inGameActionMap;
         protected InGameInputActions InGameActions { get; private set; }
+        protected GlobalInputActions GlobalActions { get; private set; }
         protected Vector2 FreeCursorPosition { get; private set; }
 
         protected virtual void OnEnable()
@@ -47,15 +48,24 @@ namespace Minesweeper.Runtime
             OnClickSecondary(context.ReadValueAsButton());
         }
 
-        protected abstract void OnClickPrimary(bool pressed);
-        protected abstract void OnClickSecondary(bool pressed);
+        protected virtual void OnClickPrimary(bool pressed) {}
+        protected virtual void OnClickSecondary(bool pressed) {}
+
+        protected readonly struct GlobalInputActions
+        {
+            public readonly InputAction cancel, toggleFullScreen;
+        }
 
         protected readonly struct InGameInputActions
         {
             public readonly InputAction
-                clickPrimary, clickSecondary, freeCursorPosition;
+                clickPrimary,
+                clickSecondary,
+                freeCursorPosition;
 
-            public InGameInputActions(InputAction clickPrimary, InputAction clickSecondary, InputAction freeCursorPosition)
+            public InGameInputActions(InputAction clickPrimary,
+                InputAction clickSecondary,
+                InputAction freeCursorPosition)
             {
                 this.clickPrimary = clickPrimary;
                 this.clickSecondary = clickSecondary;
