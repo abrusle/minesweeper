@@ -8,21 +8,29 @@ namespace Minesweeper.Runtime
     using Data;
     using Views;
     
+    /// <summary>
+    /// To Refactor
+    /// Split into :
+    ///  - SceneContext
+    ///  - Level Manager
+    ///  - LevelData (cell table)
+    /// </summary>
     public class GameSceneContext : SceneContext
     {
         public GameCameraClassic gameCamera;
         public LevelSettings levelSettings;
         public LevelGridView levelGridView;
         public GameUiView uiView;
+        public LevelInputEvents inputEvents;
         [FormerlySerializedAs("hoverIndicator")] public CursorView cursor;
         
         private Cell[,] _level;
         private int _emptyCellsLeft;
-        private GameState _gameState;
+        private LevelState _levelState;
         private Vector2Int _cursorGridPos;
         private int _flagCount;
 
-        private enum GameState
+        private enum LevelState
         {
             Running, Over, Won
         }
@@ -32,9 +40,7 @@ namespace Minesweeper.Runtime
             _level = null;
             _emptyCellsLeft = levelSettings.size.x * levelSettings.size.y;
             _flagCount = 0;
-            _gameState = GameState.Running;
-            cursor.positionMin = Vector2Int.zero;
-            cursor.positionMax = levelSettings.size - Vector2Int.one;
+            _levelState = LevelState.Running;
             levelGridView.OnGameStart(gameCamera);
             gameCamera.FitToLevel(levelSettings.size, levelGridView.Grid);
             uiView.OnMinesLeftCountChange(levelSettings.mineCount);
@@ -43,30 +49,20 @@ namespace Minesweeper.Runtime
         
         private void OnEnable()
         {
-            InputHandler.LeftClick += OnLeftClick;
-            InputHandler.RightClick += OnRightClick;
+            inputEvents.NormalClick.OnClicked.AddListener(OnLeftClick);
+            inputEvents.SpecialClick.OnClicked.AddListener(OnRightClick);
         }
 
         private void OnDisable()
         {
-            InputHandler.LeftClick -= OnLeftClick;
-            InputHandler.RightClick -= OnRightClick;
+            inputEvents.NormalClick.OnClicked.RemoveListener(OnLeftClick);
+            inputEvents.SpecialClick.OnClicked.RemoveListener(OnRightClick);
         }
 
-        private void Update()
+        private void OnLeftClick(Vector2Int cellPos)
         {
-            if (_gameState == GameState.Running)
-            {
-                var worldPoint = gameCamera.Camera.ScreenToWorldPoint(Input.mousePosition);
-                _cursorGridPos = (Vector2Int) levelGridView.Grid.WorldToCell(worldPoint);
-                cursor.UpdatePosition(_cursorGridPos);
-            }
-        }
-
-        private void OnLeftClick()
-        {
-            if (_gameState != GameState.Running) return;
-            var cellPos = _cursorGridPos;
+            if (_levelState != LevelState.Running)
+                return;
 
             if (_level == null || _level.Length == 0)
             {
@@ -111,11 +107,10 @@ namespace Minesweeper.Runtime
                 OnGameWon();
         }
 
-        private void OnRightClick()
+        private void OnRightClick(Vector2Int cellPos)
         {
-            if (_gameState != GameState.Running) return;
+            if (_levelState != LevelState.Running) return;
             if (_level == null || _level.Length == 0) return;
-            var cellPos = _cursorGridPos;
 
             if (_level.TryGetValue(cellPos, out var cell) && !cell.isRevealed)
             {
@@ -137,7 +132,7 @@ namespace Minesweeper.Runtime
 
         private void OnGameWon()
         {
-            _gameState = GameState.Won;
+            _levelState = LevelState.Won;
             levelGridView.DrawGameWon(gameCamera);
 
             for (int x = 0; x < _level.GetLength(0); x++)
@@ -153,7 +148,7 @@ namespace Minesweeper.Runtime
 
         private void OnGameOver()
         {
-            _gameState = GameState.Over;
+            _levelState = LevelState.Over;
             levelGridView.DrawGameOver(gameCamera);
             
             for (int x = 0; x < _level.GetLength(0); x++)

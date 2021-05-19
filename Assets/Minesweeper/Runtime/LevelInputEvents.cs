@@ -1,11 +1,12 @@
 ﻿using System;
 using Minesweeper.Runtime.Data;
+using Minesweeper.Runtime.Input;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace Minesweeper.Runtime
 {
-    public class LevelInputEvents : InputSystemInterpreter
+    public class LevelInputEvents : LevelActions
     {
         /// <summary>
         /// Invoked when the mouse hovers over a new cell.
@@ -26,31 +27,44 @@ namespace Minesweeper.Runtime
         private UnityEvent<Vector2Int?> onCellHovered;
 
         private Vector2Int _currentCursorGridPos;
-        private bool _currentlyWithinLevelBounds;
+        private Vector3 _freeCursorPosition;
+        private bool _withinLevelBounds;
 
         [SerializeField] private ClickTracker normalClick, specialClick;
+        
+        private void OnEnable()
+        {
+            normalClick.Enabled = true;
+            specialClick.Enabled = true;
+            GeneralActions.Cancel += OnCancelKey;
+        }
 
-        // TODO add ESC key to cancel selection
+        private void OnDisable()
+        {
+            normalClick.Enabled = false;
+            specialClick.Enabled = false;
+            GeneralActions.Cancel -= OnCancelKey;
+        }
 
         /// <inheritdoc />
         protected override void Update()
         {
-            base.Update();
+            _freeCursorPosition = UnityEngine.Input.mousePosition;
+
             // TODO handle cursor leaving and entering window
-            var newCursorPos = (Vector2Int) levelGrid.WorldToCell(camera.ScreenToWorldPoint(FreeCursorPosition));
+            var newCursorPos = (Vector2Int) levelGrid.WorldToCell(camera.ScreenToWorldPoint(_freeCursorPosition));
             if (newCursorPos != _currentCursorGridPos)
             {
-                bool withinLevelBounds = LevelUtility.IsCellWithinBounds(newCursorPos, levelSettings.size);
+                _withinLevelBounds = LevelUtility.IsCellWithinBounds(newCursorPos, levelSettings.size);
                 _currentCursorGridPos = newCursorPos;
                 normalClick.currentCursorGridPos = specialClick.currentCursorGridPos = _currentCursorGridPos;
-                if (_currentlyWithinLevelBounds || withinLevelBounds)
-                    onCellHovered.Invoke(withinLevelBounds ? _currentCursorGridPos : (Vector2Int?) null);
-
-                _currentlyWithinLevelBounds = withinLevelBounds;
+                if (enabled) onCellHovered.Invoke(_withinLevelBounds ? _currentCursorGridPos : (Vector2Int?) null);
 
                 normalClick.OnCellHovered(_currentCursorGridPos);
                 specialClick.OnCellHovered(_currentCursorGridPos);
             }
+
+            base.Update();
         }
 
         /// <inheritdoc />
@@ -77,9 +91,15 @@ namespace Minesweeper.Runtime
                 specialClick.OnRelease();
         }
 
+        private void OnCancelKey()
+        {
+            normalClick.CancelSelection();
+            specialClick.CancelSelection();
+        }
+
         private bool CanEmitEvents()
         {
-            return LevelUtility.IsCellWithinBounds(_currentCursorGridPos, levelSettings.size);
+            return _withinLevelBounds;
             // TODO check if click is over a UI object.
         }
 
@@ -93,9 +113,16 @@ namespace Minesweeper.Runtime
         [Serializable]
         private class ClickTracker : IClickEventEmitter
         {
+            /// <inheritdoc/>
             public UnityEvent<Vector2Int> OnSelected => onSelected;
+            
+            /// <inheritdoc/>
             public UnityEvent<Vector2Int> OnClicked => onClicked;
+            
+            /// <inheritdoc/>
             public UnityEvent<Vector2Int> OnDeselected => onDeselected;
+
+            public bool Enabled { get; set; } = true;
             
             [NonSerialized]
             public Vector2Int currentCursorGridPos;
@@ -110,14 +137,14 @@ namespace Minesweeper.Runtime
             {
                 if (_selectedCell != null && _selectedCell.Value != hoverCell)
                 {
-                    onDeselected?.Invoke(_selectedCell.Value);
+                    if (Enabled) onDeselected?.Invoke(_selectedCell.Value);
                     _selectedCell = null;
                 }
             }
 
             public void OnPress()
             {
-                onSelected?.Invoke(currentCursorGridPos);
+                if (Enabled) onSelected?.Invoke(currentCursorGridPos);
                 _selectedCell = currentCursorGridPos;
             }
 
@@ -127,10 +154,19 @@ namespace Minesweeper.Runtime
 
                 if (_selectedCell.Value == currentCursorGridPos)
                 {
-                    onClicked?.Invoke(currentCursorGridPos);
+                    if (Enabled) onClicked?.Invoke(currentCursorGridPos);
                 }
                 
-                onDeselected?.Invoke(currentCursorGridPos);
+                if (Enabled) onDeselected?.Invoke(currentCursorGridPos);
+                _selectedCell = null;
+            }
+
+            public void CancelSelection()
+            {
+                if (_selectedCell == null)
+                    return;
+                
+                if (Enabled) onDeselected?.Invoke(currentCursorGridPos);
                 _selectedCell = null;
             }
         }

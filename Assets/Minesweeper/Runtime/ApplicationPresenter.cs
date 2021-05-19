@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Minesweeper.Runtime.Input;
+using UnityEngine;
 
 namespace Minesweeper.Runtime
 {
@@ -8,7 +9,7 @@ namespace Minesweeper.Runtime
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void OnApplicationLoad()
         {
-            InputHandler.FullScreenToggle += Instance.OnFullscreenToggle;
+            GeneralActions.ToggleFullscreen += Instance.OnFullscreenToggle;
         }
 
         private void OnFullscreenToggle()
