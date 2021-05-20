@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Minesweeper.Runtime.Input
+﻿namespace Minesweeper.Runtime.Input
 {
     public class LevelActions : InputHandler
     {

@@ -38,7 +38,6 @@ namespace Minesweeper.Runtime.Views
 
         private void OnCellHovered(Vector2Int? cellPos)
         {
-            Debug.Log(cellPos == null ? "null" : cellPos.Value.ToString());
             if (cellPos == null) // Out of bounds
             {
                 CursorUtility.SetCursor(normalCursor);

@@ -4,7 +4,7 @@ namespace Minesweeper.Runtime.Input
 {
     public class InputHandler : MonoBehaviour
     {
-        public delegate void KeyChangeDelegate(bool keyPressed);
+        public delegate void KeyChangeDelegate(bool isPressed);
         public delegate void InputActionEventDelegate();
 
         protected KeybindSettings keybindings;
@@ -19,7 +19,7 @@ namespace Minesweeper.Runtime.Input
             if (UnityEngine.Input.GetKeyDown(keybindings[action]))
                 keyEvent?.Invoke(true);
             else if (UnityEngine.Input.GetKeyUp(keybindings[action]))
-                keyEvent?.Invoke(true);
+                keyEvent?.Invoke(false);
         }
 
         protected void HandleActionSimple(UserAction action, InputActionEventDelegate keyEvent)
