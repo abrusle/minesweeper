@@ -43,11 +43,16 @@ namespace Minesweeper.Runtime
             neighbors[2] = new Vector2Int(cell.x, cell.y - 1);
             neighbors[3] = new Vector2Int(cell.x - 1, cell.y);
         }
+        
+        public static bool IsCellWithinBounds(int x, int y, Vector2Int bounds)
+        {
+            return x >= 0 && x < bounds.x &&
+                   y >= 0 && y < bounds.y;
+        }
 
         public static bool IsCellWithinBounds(Vector2Int cell, Vector2Int bounds)
         {
-            return cell.x >= 0 && cell.x < bounds.x &&
-                   cell.y >= 0 && cell.y < bounds.y;
+            return IsCellWithinBounds(cell.x, cell.y, bounds);
         }
     }
 }

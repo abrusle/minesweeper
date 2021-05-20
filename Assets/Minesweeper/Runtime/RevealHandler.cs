@@ -28,22 +28,23 @@ namespace Minesweeper.Runtime
             }
         }
 
-        public static void RevealCellsRecursively(Cell[,] level, int x, int y, Dictionary<Vector2Int, Cell> revealList)
+        public static void RevealCellsRecursively(LevelTable level, int x, int y, Dictionary<Vector2Int, Cell> revealList)
         {
-            if (revealList.Count > level.Length)
+            if (revealList.Count > level.CellCount)
                 throw new OverflowException();
             
             var pos = new Vector2Int(x, y);
             if (revealList.ContainsKey(pos)) 
                 return;
-            
-            if (!level.TryGetValue(x, y, out Cell cell))
-                return; // Indexes out of range
 
+            if (!LevelUtility.IsCellWithinBounds(x, y, level.Size))
+                return; // Indexes out of range.
+
+            Cell cell = level[x, y];
             if (cell.isRevealed || cell.hasFlag)
                 return; // cell is no subject revelation.
 
-            level[x, y].isRevealed = true;
+            level.MarkCellRevealed(pos);
             revealList[pos] = level[x, y];
             
             if (cell.value == 0)
