@@ -92,11 +92,13 @@ namespace Minesweeper.Runtime
             private readonly Cell[,] _cells;
             private Vector2Int _currentIndex;
             private TableCellEnumeration _currentCell;
+            
+            private static Vector2Int BeforeStartIndex => new Vector2Int(-1, 0);
 
             public TableEnumerator(Cell[,] cells)
             {
                 _cells = cells;
-                _currentIndex = Vector2Int.zero;
+                _currentIndex = BeforeStartIndex;
                 _currentCell = default;
             }
 
@@ -111,6 +113,7 @@ namespace Minesweeper.Runtime
                     }
                     else
                     {
+                        _currentIndex.x = 0;
                         _currentCell = CreateCurrentObject();
                     }
                 }
@@ -130,7 +133,7 @@ namespace Minesweeper.Runtime
             /// <inheritdoc />
             void IEnumerator.Reset()
             {
-                _currentIndex = Vector2Int.zero;
+                _currentIndex = BeforeStartIndex;
             }
 
             /// <inheritdoc />
