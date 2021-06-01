@@ -13,7 +13,6 @@ namespace Minesweeper.Runtime.Views
         [SerializeField] private CellView cellViewPrefab;
         [SerializeField] private ColorSheet colorSheet;
         [SerializeField, Min(0)] private int revealAnimationInterval;
-        
 
         private CellView[,] _cellViews;
         private AnimationSequence<RevealAnimationDatum> _revealSequence;
@@ -40,21 +39,13 @@ namespace Minesweeper.Runtime.Views
             else
                 PlayRevealAnimation(datum);
         }
-
-        public void FlagCell(int x, int y)
+        
+        public void SetCellFlag(int x, int y, bool active)
         {
             var cellView = _cellViews[x,y];
-            cellView.backgroundSprite.color = colorSheet.flaggedCellColor; //new Color(1f, 0.94f, 0.51f);
-            cellView.FlagColor = colorSheet.flagColor; //new Color(0.43f, 0.36f, 0.15f);
-            cellView.ToggleFlag(true);
-        }
-
-        public void UnflagCell(int x, int y)
-        {
-            var cellView = _cellViews[x,y];
-            cellView.backgroundSprite.color = colorSheet.unrevealedCellColor;
-            cellView.FlagColor = colorSheet.GetColor(0);
-            cellView.ToggleFlag(false);
+            cellView.backgroundSprite.color = active ? colorSheet.flaggedCellColor : colorSheet.unrevealedCellColor;
+            cellView.FlagColor = active ? colorSheet.flagColor : colorSheet.GetColor(0);
+            cellView.ToggleFlag(active);
         }
 
         public void Clear()
@@ -83,7 +74,7 @@ namespace Minesweeper.Runtime.Views
                 for (int y = 0; y < yMax; y++)
                 {
                     var cellView = Instantiate(cellViewPrefab, root);
-                    cellView.name = $"Cell [{x};{y}]";
+                    cellView.name = $"Cell [{x}; {y}]";
                     cellView.transform.localPosition = Grid.GetCellCenterLocal(new Vector3Int(x, y, 0));
                     _cellViews[x, y] = cellView;
                     cellView.textMesh.text = string.Empty;
@@ -118,7 +109,10 @@ namespace Minesweeper.Runtime.Views
 
         private void PlayRevealAnimation(RevealAnimationDatum datum)
         {
-            var cellView = _cellViews[datum.x, datum.y];
+            CellView cellView = _cellViews[datum.x, datum.y];
+            
+            cellView.SetState(CellView.State.InReveal);
+            
             if (datum.cell.value != 0)
             {
                 cellView.textMesh.text = datum.cell.hasMine ? "*" : datum.cell.value.ToString();
@@ -147,6 +141,16 @@ namespace Minesweeper.Runtime.Views
                 this.x = x;
                 this.y = y;
             }
+        }
+
+        public void SelectCell(int x, int y)
+        {
+            _cellViews[x, y].SetState(CellView.State.Selected);
+        }
+
+        public void DeselectCell(int x, int y)
+        {
+            _cellViews[x, y].SetState(CellView.State.AtRest);
         }
     }
 }

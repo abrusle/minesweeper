@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.abrusle.quick-scenes": "https://github.com/abrusle/unitySceneSwitcher.git",
     "com.azixmcaze.unityserializabledictionary": "https://github.com/abrusle/Unity-SerializableDictionary.git",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.2d.tilemap": "1.0.0",

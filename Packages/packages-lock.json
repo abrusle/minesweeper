@@ -1,5 +1,15 @@
 {
   "dependencies": {
+    "com.abrusle.quick-scenes": {
+      "version": "https://github.com/abrusle/unitySceneSwitcher.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.ugui": "1.0.0",
+        "com.unity.modules.imgui": "1.0.0"
+      },
+      "hash": "506c0e0c124d270b4b4ffa2c97458b5a9aca1c12"
+    },
     "com.azixmcaze.unityserializabledictionary": {
       "version": "https://github.com/abrusle/Unity-SerializableDictionary.git",
       "depth": 0,

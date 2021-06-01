@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Minesweeper.Runtime
 {
@@ -22,9 +21,8 @@ namespace Minesweeper.Runtime
         public LevelGridView levelGridView;
         public GameUiView uiView;
         public LevelInputEvents inputEvents;
-        [FormerlySerializedAs("hoverIndicator")] public CursorView cursor;
         
-        private LevelTable _level = new LevelTable();
+        private readonly LevelTable _level = new LevelTable();
         private int _emptyCellsLeft;
         private LevelState _levelState;
         private Vector2Int _cursorGridPos;
@@ -50,13 +48,33 @@ namespace Minesweeper.Runtime
         private void OnEnable()
         {
             inputEvents.NormalClick.OnClicked.AddListener(OnLeftClick);
+            inputEvents.NormalClick.OnSelected.AddListener(OnCellSelected);
+            inputEvents.NormalClick.OnDeselected.AddListener(OnCellDeselected);
             inputEvents.SpecialClick.OnClicked.AddListener(OnRightClick);
+        }
+
+        private void OnCellDeselected(Vector2Int cellPos)
+        {
+            levelGridView.DeselectCell(cellPos.x, cellPos.y);
+        }
+
+        private void OnCellSelected(Vector2Int cellPos)
+        {
+            if (!_level.Generated || !_level[cellPos].isRevealed)
+                levelGridView.SelectCell(cellPos.x, cellPos.y);
         }
 
         private void OnDisable()
         {
             inputEvents.NormalClick.OnClicked.RemoveListener(OnLeftClick);
+            inputEvents.NormalClick.OnSelected.RemoveListener(OnCellSelected);
+            inputEvents.NormalClick.OnDeselected.RemoveListener(OnCellDeselected);
             inputEvents.SpecialClick.OnClicked.RemoveListener(OnRightClick);
+        }
+
+        private void OnDestroy()
+        {
+            _level?.Clear();
         }
 
         private void OnLeftClick(Vector2Int cellPos)
@@ -74,7 +92,7 @@ namespace Minesweeper.Runtime
 
             Cell cell = _level[cellPos];
 
-            if (cell.hasFlag)
+            if (cell.hasFlag || cell.isRevealed)
                 return;
             
             if (cell.hasMine)
@@ -106,12 +124,12 @@ namespace Minesweeper.Runtime
             {
                 if (cell.hasFlag)
                 {
-                    levelGridView.UnflagCell(cellPos.x, cellPos.y);
+                    levelGridView.SetCellFlag(cellPos.x, cellPos.y, false);
                     _flagCount--;
                 }
                 else
                 {
-                    levelGridView.FlagCell(cellPos.x, cellPos.y);
+                    levelGridView.SetCellFlag(cellPos.x, cellPos.y, true);
                     _flagCount++;
                 }
 
@@ -128,7 +146,7 @@ namespace Minesweeper.Runtime
             foreach (var tableCell in _level)
             {
                 if (tableCell.data.hasMine)
-                        levelGridView.FlagCell(tableCell.position.x, tableCell.position.y);
+                        levelGridView.SetCellFlag(tableCell.position.x, tableCell.position.y, true);
             }
         }
 
