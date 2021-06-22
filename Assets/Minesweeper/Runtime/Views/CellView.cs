@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using Minesweeper.Runtime.Animation;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -6,13 +7,6 @@ namespace Minesweeper.Runtime.Views
 {
     public class CellView : MonoBehaviour
     {
-        public enum State
-        {
-            AtRest,
-            Selected,
-            InReveal
-        }
-        
         public TextMeshPro textMesh;
         [FormerlySerializedAs("maskingSprite")]
         public SpriteRenderer backgroundSprite;
@@ -25,12 +19,6 @@ namespace Minesweeper.Runtime.Views
             public static readonly int IsVisible = Animator.StringToHash("IsVisible");
         }
 
-        private readonly struct MainAnimatorParameters
-        {
-            public static readonly int Selected = Animator.StringToHash("Selected");
-            public static readonly int Reveal = Animator.StringToHash("Reveal");
-        }
-        
         public void ToggleFlag(bool active)
         {
             flagAnimator.SetBool(FlagAnimatorProperties.IsVisible, active);
@@ -58,21 +46,9 @@ namespace Minesweeper.Runtime.Views
             }
         }
 
-        public void SetState(State state)
+        public void SetState(CellAnimatorHelper.State state)
         {
-            switch (state)
-            {
-                case State.AtRest:
-                    mainAnimator.SetBool(MainAnimatorParameters.Selected, false);
-                    break;
-                case State.Selected:
-                    mainAnimator.SetBool(MainAnimatorParameters.Selected, true);
-                    break;
-                case State.InReveal:
-                    mainAnimator.SetTrigger(MainAnimatorParameters.Reveal);
-                    mainAnimator.SetBool(MainAnimatorParameters.Selected, false);
-                    break;
-            }
+            CellAnimatorHelper.SetState(state, mainAnimator);
         }
     }
 }

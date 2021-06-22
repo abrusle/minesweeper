@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Minesweeper.Runtime.Animation;
 using Minesweeper.Runtime.Data;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -25,6 +26,12 @@ namespace Minesweeper.Runtime.Views
         
         private bool _isVisible;
         private Coroutine _transitionCoroutine;
+        private Animator _animator;
+
+        private void Awake()
+        {
+            _animator = GetComponent<Animator>();
+        }
 
         private void OnEnable()
         {
@@ -43,35 +50,12 @@ namespace Minesweeper.Runtime.Views
                 CursorUtility.SetCursor(normalCursor);
                 HideHighlight();
             }
-            else if (_isVisible == false || animate == false) // insde bounds but was hidden previously
+            else if (_isVisible == false || animate == false) // inside bounds but was hidden previously
             {
                 CursorUtility.SetCursor(pointerCursor);
                 ShowHighlight(cellPos.Value);
             }
             else TransitionHighlight(cellPos.Value); // inside bounds -> inside bounds
-        }
-
-        public void UpdatePosition(Vector2Int cellAtCursor)
-        {
-            /*
-            if (cellAtCursor == _currentPosition) return;
-
-            _currentPosition = cellAtCursor;
-            if (cellAtCursor.x < positionMin.x ||
-                cellAtCursor.y < positionMin.y ||
-                cellAtCursor.x > positionMax.x ||
-                cellAtCursor.y > positionMax.y) // Out of bounds
-            {
-                CursorUtility.SetCursor(normalCursor);
-                HideHighlight();
-            }
-            else if (_isVisible == false || animate == false) // insde bounds but was hidden previously
-            {
-                CursorUtility.SetCursor(pointerCursor);
-                ShowHighlight(_currentPosition);
-            }
-            else TransitionHighlight(_currentPosition); // inside bounds -> inside bounds
-            */
         }
 
         private void HideHighlight()
@@ -120,6 +104,21 @@ namespace Minesweeper.Runtime.Views
         private Vector3 CellToWorld(Vector2Int cellPos)
         {
             return grid.CellToWorld(cellPos.AddZ(0)) + (grid.cellSize + grid.cellGap) * 0.5f;
+        }
+
+        public void OnCellDeselected()
+        {
+            CellAnimatorHelper.SetState(CellAnimatorHelper.State.AtRest, _animator);
+        }
+
+        public void OnCellSelected()
+        {
+            CellAnimatorHelper.SetState(CellAnimatorHelper.State.Selected, _animator);
+        }
+
+        public void OnCellReveal()
+        {
+            CellAnimatorHelper.SetState(CellAnimatorHelper.State.InReveal, _animator);
         }
     }
 }

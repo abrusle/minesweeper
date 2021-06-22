@@ -21,6 +21,7 @@ namespace Minesweeper.Runtime
         public LevelGridView levelGridView;
         public GameUiView uiView;
         public LevelInputEvents inputEvents;
+        public CursorView cursorView;
         
         private readonly LevelTable _level = new LevelTable();
         private int _emptyCellsLeft;
@@ -56,12 +57,16 @@ namespace Minesweeper.Runtime
         private void OnCellDeselected(Vector2Int cellPos)
         {
             levelGridView.DeselectCell(cellPos.x, cellPos.y);
+            cursorView.OnCellDeselected();
         }
 
         private void OnCellSelected(Vector2Int cellPos)
         {
             if (!_level.Generated || !_level[cellPos].isRevealed)
+            {
                 levelGridView.SelectCell(cellPos.x, cellPos.y);
+                cursorView.OnCellSelected();
+            }
         }
 
         private void OnDisable()
@@ -108,6 +113,8 @@ namespace Minesweeper.Runtime
             {
                 levelGridView.RevealCell(pair.Value, pair.Key.x, pair.Key.y);
             }
+
+            cursorView.OnCellReveal();
 
             _emptyCellsLeft -= toReveal.Count;
             if (_emptyCellsLeft <= _level.MineCount)

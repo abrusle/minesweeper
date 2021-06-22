@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 namespace Minesweeper.Runtime.Views
 {
@@ -13,9 +14,11 @@ namespace Minesweeper.Runtime.Views
         [SerializeField] private CellView cellViewPrefab;
         [SerializeField] private ColorSheet colorSheet;
         [SerializeField, Min(0)] private int revealAnimationInterval;
-
+        [SerializeField, Min(0)] private float spawnAnimationInterval;
+        
         private CellView[,] _cellViews;
         private AnimationSequence<RevealAnimationDatum> _revealSequence;
+        private Coroutine _drawLevelOperation;
 
         private void Awake()
         {
@@ -61,6 +64,9 @@ namespace Minesweeper.Runtime.Views
 
         public void DrawLevelGrid(int xMax, int yMax)
         {
+            if (_drawLevelOperation !=  null)
+                StopCoroutine(_drawLevelOperation);
+            
             Clear();
 
             var root = new GameObject($"Level ({xMax} x {yMax})").transform;
@@ -68,22 +74,42 @@ namespace Minesweeper.Runtime.Views
             root.localPosition = Vector3.zero;
             
             _cellViews = new CellView[xMax, yMax];
-            
-            for (int x = 0; x < xMax; x++)
+            _drawLevelOperation = StartCoroutine(InstantiateAsync());
+
+            IEnumerator InstantiateAsync()
             {
-                for (int y = 0; y < yMax; y++)
+                var interval = new WaitForSeconds(spawnAnimationInterval);
+
+                var iMax = new Vector2Int(xMax - 1, yMax - 1);
+                int nMax = iMax.x + iMax.y;
+                for (int n = 0; n <= nMax; n++)
                 {
-                    var cellView = Instantiate(cellViewPrefab, root);
-                    cellView.name = $"Cell [{x}; {y}]";
-                    cellView.transform.localPosition = Grid.GetCellCenterLocal(new Vector3Int(x, y, 0));
-                    _cellViews[x, y] = cellView;
-                    cellView.textMesh.text = string.Empty;
-                    cellView.textMesh.enabled = false;
-                    cellView.backgroundSprite.color = colorSheet.unrevealedCellColor;
+                    for (int i = 0; i <= n; i++)
+                    {
+                        var coord = new Vector2Int(n - i, i);
+                        if (coord.x > iMax.x || coord.y > iMax.y)
+                            continue;
+                        InstantiateCell(root, coord.x, coord.y);
+                    }
+
+                    yield return interval;
                 }
+
+                _drawLevelOperation = null;
             }
             
             MoveLevelCenterToWorldOrigin(xMax, yMax);
+        }
+
+        private void InstantiateCell(Transform root, int x, int y)
+        {
+            var cellView = Instantiate(cellViewPrefab, root);
+            cellView.name = $"Cell [{x}; {y}]";
+            cellView.transform.localPosition = Grid.GetCellCenterLocal(new Vector3Int(x, y, 0));
+            _cellViews[x, y] = cellView;
+            cellView.textMesh.text = string.Empty;
+            cellView.textMesh.enabled = false;
+            cellView.backgroundSprite.color = colorSheet.unrevealedCellColor;
         }
 
         public void OnGameStart(Camera bgCamera)
@@ -104,15 +130,15 @@ namespace Minesweeper.Runtime.Views
         private void MoveLevelCenterToWorldOrigin(int xMax, int yMax)
         {
             var gridPos = new Vector3(-xMax, -yMax, 0);
-            Grid.transform.position = (Grid.cellSize + Grid.cellGap).MultiplyComponents(gridPos) * 0.5f;;
+            Grid.transform.position = (Grid.cellSize + Grid.cellGap).MultiplyComponents(gridPos) * 0.5f;
         }
 
         private void PlayRevealAnimation(RevealAnimationDatum datum)
         {
             CellView cellView = _cellViews[datum.x, datum.y];
             
-            cellView.SetState(CellView.State.InReveal);
-            
+            cellView.SetState(CellAnimatorHelper.State.InReveal);
+
             if (datum.cell.value != 0)
             {
                 cellView.textMesh.text = datum.cell.hasMine ? "*" : datum.cell.value.ToString();
@@ -145,12 +171,12 @@ namespace Minesweeper.Runtime.Views
 
         public void SelectCell(int x, int y)
         {
-            _cellViews[x, y].SetState(CellView.State.Selected);
+            _cellViews[x, y].SetState(CellAnimatorHelper.State.Selected);
         }
 
         public void DeselectCell(int x, int y)
         {
-            _cellViews[x, y].SetState(CellView.State.AtRest);
+            _cellViews[x, y].SetState(CellAnimatorHelper.State.AtRest);
         }
     }
 }

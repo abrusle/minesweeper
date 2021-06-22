@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Current Level Settings
   m_EditorClassIdentifier: 
   size: {x: 12, y: 12}
-  mineCount: 24
+  mineCount: 12

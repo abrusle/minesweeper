@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using UnityEngine;
 
-namespace Minesweeper.Runtime.Views.Animation
+namespace Minesweeper.Runtime.Animation
 {
     public class AnimationSequence<TData> : IDisposable
     {

@@ -14,7 +14,7 @@ namespace Minesweeper.Runtime.Dev
 
         private void Awake()
         {
-            enabled = Application.isEditor;
+            if (!Application.isEditor) enabled = false;
             _input = GetComponent<LevelInputEvents>();
         }
 
