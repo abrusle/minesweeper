@@ -1,0 +1,21 @@
+{
+    "name": "Minesweeper.Runtime.Infinite",
+    "rootNamespace": "Minesweeper.Runtime.Infinite",
+    "references": [
+        "Unity.TextMeshPro",
+        "Abrusle.ScriptableSingleton",
+        "Abrusle.UnityCoroutween",
+        "Unity.SerializableDictionary",
+        "Abrusle.ScriptableDictionary",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
