@@ -4,6 +4,6 @@ namespace Minesweeper.Runtime.Infinite
 {
     public interface ICellInitializer
     {
-        void InitializeCell(Vector2Int cellPosition, Transform instance);
+        void UpdateCellView(Transform instance, Vector2Int cellPosition, CellStatusFlags cellStatus);
     }
 }

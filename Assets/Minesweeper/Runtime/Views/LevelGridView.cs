@@ -130,7 +130,9 @@ namespace Minesweeper.Runtime.Views
         private void MoveLevelCenterToWorldOrigin(int xMax, int yMax)
         {
             var gridPos = new Vector3(-xMax, -yMax, 0);
-            Grid.transform.position = (Grid.cellSize + Grid.cellGap).MultiplyComponents(gridPos) * 0.5f;
+            var sizeAndGap = (Grid.cellSize + Grid.cellGap);
+            sizeAndGap.Scale(gridPos);
+            Grid.transform.position = sizeAndGap * 0.5f;
         }
 
         private void PlayRevealAnimation(RevealAnimationDatum datum)

@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Minesweeper.Runtime.Data;
 using Minesweeper.Runtime.Input;
 using UnityEngine;
@@ -19,7 +20,7 @@ namespace Minesweeper.Runtime
         
         [SerializeField] private new Camera camera;
         [SerializeField] private Grid levelGrid;
-        [SerializeField] private LevelSettings levelSettings;
+        [SerializeField, CanBeNull] private LevelSettings levelSettings;
         
 
         [Space]
@@ -55,10 +56,13 @@ namespace Minesweeper.Runtime
             var newCursorPos = (Vector2Int) levelGrid.WorldToCell(camera.ScreenToWorldPoint(_freeCursorPosition));
             if (newCursorPos != _currentCursorGridPos)
             {
-                _withinLevelBounds = LevelUtility.IsCellWithinBounds(newCursorPos, levelSettings.size);
+                _withinLevelBounds = levelSettings == null || LevelUtility.IsCellWithinBounds(newCursorPos, levelSettings.size);
                 _currentCursorGridPos = newCursorPos;
                 normalClick.currentCursorGridPos = specialClick.currentCursorGridPos = _currentCursorGridPos;
-                if (enabled) onCellHovered.Invoke(_withinLevelBounds ? _currentCursorGridPos : (Vector2Int?) null);
+                if (enabled)
+                {
+                    onCellHovered.Invoke(_withinLevelBounds ? _currentCursorGridPos : null);
+                }
 
                 normalClick.OnCellHovered(_currentCursorGridPos);
                 specialClick.OnCellHovered(_currentCursorGridPos);

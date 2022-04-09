@@ -7,7 +7,7 @@
         "Abrusle.UnityCoroutween",
         "Unity.SerializableDictionary",
         "Abrusle.ScriptableDictionary",
-        "Unity.InputSystem"
+        "Minesweeper.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
