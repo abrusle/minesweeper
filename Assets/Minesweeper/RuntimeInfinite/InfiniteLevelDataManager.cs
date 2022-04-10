@@ -28,6 +28,18 @@ namespace Minesweeper.Runtime.Infinite
         [NonSerialized] private readonly Dictionary<Vector2Int, CellStatusFlags> _generatedCells = new();
         [NonSerialized] private BoundsInt _generatedBounds;
 
+        [PublicAPI] public void Clear()
+        {
+            foreach (var (coord, status) in _generatedCells)
+            {
+                if (status == CellStatusFlags.None) continue;
+                CellStatusChanged?.Invoke(coord, CellStatusFlags.None);
+            }
+            
+            _generatedCells.Clear();
+            _generatedBounds = new BoundsInt(0, 0, 0, 0, 0, 0);
+        }
+
         [PublicAPI] public bool IsCellGenerated(Vector2Int coords)
         {
             return _generatedCells.ContainsKey(coords);
