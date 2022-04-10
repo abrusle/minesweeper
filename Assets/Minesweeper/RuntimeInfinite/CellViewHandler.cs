@@ -60,7 +60,7 @@ namespace Minesweeper.Runtime.Infinite
 
                     ArrayPool<Vector2Int>.Release(neighbors);
 
-                    view.textMesh.text = cellValue.ToString();
+                    view.textMesh.text = cellValue == 0 ? "" : cellValue.ToString();
                     view.textMesh.color = colorSheet.GetColorForCellValue(cellValue);
                 }
             }

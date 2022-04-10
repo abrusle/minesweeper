@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using Minesweeper.Runtime.Utility;
 using UnityEngine;
 
 namespace Minesweeper.Runtime.Infinite
@@ -48,17 +49,18 @@ namespace Minesweeper.Runtime.Infinite
             return cellStatus;
         }
 
-        [PublicAPI] public void SetCellRevealed(Vector2Int coords)
+        [PublicAPI] public bool SetCellRevealed(Vector2Int coords)
         {
             var cellStatus = GetCellStatus(coords) | CellStatusFlags.IsRevealed;
             
             if (cellStatus.HasFlag(CellStatusFlags.IsMarked))
             {
-                return;
+                return false;
             }
             
             _generatedCells[coords] = cellStatus;
             CellStatusChanged?.Invoke(coords, cellStatus);
+            return true;
         }
 
         [PublicAPI] public void SetCellMarked(Vector2Int coords, bool isMarked)
@@ -91,6 +93,41 @@ namespace Minesweeper.Runtime.Infinite
 
             _generatedCells[coords] = cellStatus;
             CellStatusChanged?.Invoke(coords, cellStatus);
+        }
+
+        [PublicAPI]
+        public void RevealCellsRecursive(Vector2Int startCoords)
+        {
+            var cellStatus = GetCellStatus(startCoords);
+            if (cellStatus.HasFlag(CellStatusFlags.IsRevealed) ||
+                cellStatus.HasFlag(CellStatusFlags.IsMarked))
+            {
+                return;
+            }
+
+            cellStatus |= CellStatusFlags.IsRevealed;
+            _generatedCells[startCoords] = cellStatus;
+            CellStatusChanged?.Invoke(startCoords, cellStatus);
+
+            const int neighborCount = 8;
+            var neighbors = ArrayPool<Vector2Int>.Get(neighborCount);
+            LevelUtility.GetAdjacentCellsSquare(startCoords, neighbors);
+            for (int i = 0; i < neighborCount; ++i)
+            {
+                Vector2Int nPos = neighbors[i];
+                var neighborStatus = GetCellStatus(nPos);
+                if (neighborStatus.HasFlag(CellStatusFlags.HasMine))
+                {
+                    return;
+                }
+            }
+
+            for (int i = 0; i < neighborCount; ++i)
+            {
+                RevealCellsRecursive(neighbors[i]);
+            }
+            
+            ArrayPool<Vector2Int>.Release(neighbors);
         }
 
         private CellStatusFlags GenerateCellData(Vector2Int coords)
