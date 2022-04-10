@@ -78,7 +78,7 @@ namespace Minesweeper.Runtime.UI.Views
             }
             targetLevelSettings.size.x = parsedInt;
             
-            SceneManager.Instance.SwitchScene(SceneManager.SceneId.GameClassic);
+            SceneManager.Instance.SwitchToGameClassic();
         }
 
         private void SetFieldValuesFromSettings(LevelSettings settings)

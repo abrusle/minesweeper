@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Minesweeper.Runtime
@@ -13,7 +15,7 @@ namespace Minesweeper.Runtime
         /// <param name="cell"></param>
         /// <param name="neighbors"></param>
         /// <exception cref="ArgumentException"></exception>
-        public static void GetAdjacentCellsSquare(Vector2Int cell, Vector2Int[] neighbors)
+        [PublicAPI] public static void GetAdjacentCellsSquare(Vector2Int cell, Vector2Int[] neighbors)
         {
             if (neighbors.Length < 8)
                 throw new ArgumentException("neighbors array must be of length 8 or more");
@@ -33,7 +35,7 @@ namespace Minesweeper.Runtime
         /// <param name="cell"></param>
         /// <param name="neighbors"></param>
         /// <exception cref="ArgumentException"></exception>
-        public static void GetAdjactentCells(Vector2Int cell, Vector2Int[] neighbors)
+        [PublicAPI] public static void GetAdjactentCells(Vector2Int cell, Vector2Int[] neighbors)
         {
             if (neighbors.Length < 4)
                 throw new ArgumentException("neighbors array must be of length 4 or more");
@@ -44,13 +46,15 @@ namespace Minesweeper.Runtime
             neighbors[3] = new Vector2Int(cell.x - 1, cell.y);
         }
         
-        public static bool IsCellWithinBounds(int x, int y, Vector2Int bounds)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI] public static bool IsCellWithinBounds(int x, int y, Vector2Int bounds)
         {
             return x >= 0 && x < bounds.x &&
                    y >= 0 && y < bounds.y;
         }
 
-        public static bool IsCellWithinBounds(Vector2Int cell, Vector2Int bounds)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [PublicAPI] public static bool IsCellWithinBounds(Vector2Int cell, Vector2Int bounds)
         {
             return IsCellWithinBounds(cell.x, cell.y, bounds);
         }

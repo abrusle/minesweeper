@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Minesweeper.Runtime.Utility;
 using Minesweeper.Runtime.Views;
 using UnityEngine;
 
@@ -17,6 +16,7 @@ namespace Minesweeper.Runtime.Infinite
         [SerializeField] private Grid grid;
         [SerializeField] private CameraController cameraController;
         [SerializeField] private InfiniteLevelDataManager levelDataManager;
+        [SerializeField] private CellViewHandler cellViewHandler;
 
         [Header("Settings")]
         [SerializeField, Min(0)] private float cleanIntervalDuration = 5;
@@ -24,7 +24,6 @@ namespace Minesweeper.Runtime.Infinite
         private const int PoolCapacity = 2048, DictionaryCapacity = 4096;
         
         private readonly Stack<Transform> _cellPool = new(PoolCapacity);
-        private readonly List<ICellInitializer> _cellPopulators = new();
         private readonly Dictionary<Vector3Int, Transform> _cellsInView = new(DictionaryCapacity);
 
         private Coroutine _cleanUpCoroutine;
@@ -52,7 +51,6 @@ namespace Minesweeper.Runtime.Infinite
 
         private void Update()
         {
-            GetComponents(_cellPopulators);
             var viewRect = _viewRect = cameraController.WorldRect;
             Vector3Int min = grid.WorldToCell(viewRect.min);
             Vector3Int max = grid.WorldToCell(viewRect.max);
@@ -159,50 +157,13 @@ namespace Minesweeper.Runtime.Infinite
             }
 
             Transform cellInstance = _cellsInView[(Vector3Int)coord];
-            UpdateCellViews(cellInstance, coord, cellStatus);
+            cellViewHandler.UpdateInstance(cellInstance.GetComponent<CellView>(), coord, cellStatus);
         }
 
         private void OnCellBecameVisible(Vector2Int cellPosition, Transform cellInstance)
         {
             var cellStatus = levelDataManager.IsCellGenerated(cellPosition) ? levelDataManager.GetCellStatus(cellPosition) : CellStatusFlags.None;
-            UpdateCellViews(cellInstance, cellPosition, cellStatus);
-        }
-
-        private void UpdateCellViews(Transform cellInstance, Vector2Int cellPosition, CellStatusFlags cellStatus)
-        {
-            var cellview = cellInstance.GetComponent<CellView>();
-            if (cellview == null) return;
-
-            bool isRevealed = cellStatus.HasFlag(CellStatusFlags.IsRevealed);
-            bool isMarked = !isRevealed && cellStatus.HasFlag(CellStatusFlags.IsMarked);
-            cellview.textMesh.enabled = isRevealed;
-            cellview.ToggleFlag(isMarked);
-            if (isRevealed)
-            {
-                if (cellStatus.HasFlag(CellStatusFlags.HasMine))
-                {
-                    cellview.textMesh.text = "*";
-                }
-                else
-                {
-                    const int neighborCount = 8;
-                    var neighbors = ArrayPool<Vector2Int>.Get(neighborCount);
-                    LevelUtility.GetAdjacentCellsSquare(cellPosition, neighbors);
-                    int cellValue = 0;
-                    for (int i = 0; i < neighborCount; ++i)
-                    {
-                        var neighborStatus = levelDataManager.GetCellStatus(neighbors[i]);
-                        if (neighborStatus.HasFlag(CellStatusFlags.HasMine))
-                        {
-                            cellValue++;
-                        }
-                    }
-
-                    ArrayPool<Vector2Int>.Release(neighbors);
-
-                    cellview.textMesh.text = cellValue.ToString();
-                }
-            }
+            cellViewHandler.UpdateInstance(cellInstance.GetComponent<CellView>(), cellPosition, cellStatus);
         }
 
         #if UNITY_EDITOR

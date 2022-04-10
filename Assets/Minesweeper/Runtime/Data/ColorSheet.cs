@@ -29,7 +29,7 @@ namespace Minesweeper.Runtime.Data
             public Color color;
         }
 
-        public Color GetColor(int value)
+        public Color GetColorForCellValue(int value)
         {
             rules = rules.OrderBy(r => r.threshold).ToArray();
             foreach (var rule in rules)
@@ -37,7 +37,7 @@ namespace Minesweeper.Runtime.Data
                 if (value <= rule.threshold) return rule.color;
             }
 
-            return rules[rules.Length - 1].color;
+            return rules[^1].color;
         }
     }
 }

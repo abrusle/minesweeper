@@ -47,7 +47,7 @@ namespace Minesweeper.Runtime.Views
         {
             var cellView = _cellViews[x,y];
             cellView.backgroundSprite.color = active ? colorSheet.flaggedCellColor : colorSheet.unrevealedCellColor;
-            cellView.FlagColor = active ? colorSheet.flagColor : colorSheet.GetColor(0);
+            cellView.FlagColor = active ? colorSheet.flagColor : colorSheet.GetColorForCellValue(0);
             cellView.ToggleFlag(active);
         }
 
@@ -145,7 +145,7 @@ namespace Minesweeper.Runtime.Views
             {
                 cellView.textMesh.text = datum.cell.hasMine ? "*" : datum.cell.value.ToString();
                 if (!datum.cell.hasMine)
-                    cellView.textMesh.color = colorSheet.GetColor(datum.cell.value);
+                    cellView.textMesh.color = colorSheet.GetColorForCellValue(datum.cell.value);
                 else
                 {
                     cellView.textMesh.color = colorSheet.mineColor;

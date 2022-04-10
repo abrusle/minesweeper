@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Minesweeper.Runtime.Utility;
 using UnityEngine;
 
 namespace Minesweeper.Runtime
@@ -19,12 +20,16 @@ namespace Minesweeper.Runtime
 
             if (cell.value == 0)
             {
-                var neighbors = new Vector2Int[8];
+                const int neighborCount = 8;
+                var neighbors = ArrayPool<Vector2Int>.Get(neighborCount);
                 LevelUtility.GetAdjacentCellsSquare(new Vector2Int(x, y), neighbors);
-                foreach (Vector2Int nPos in neighbors)
+                for (int i = 0; i < neighborCount; i++)
                 {
+                    Vector2Int nPos = neighbors[i];
                     StartRevealChain(level, nPos.x, nPos.y, onSouldReveal);
                 }
+
+                ArrayPool<Vector2Int>.Release(neighbors);
             }
         }
 
@@ -42,19 +47,23 @@ namespace Minesweeper.Runtime
 
             Cell cell = level[x, y];
             if (cell.isRevealed || cell.hasFlag)
-                return; // cell is no subject revelation.
+                return; // cell is not subject revelation.
 
             level.MarkCellRevealed(pos);
             revealList[pos] = level[x, y];
             
             if (cell.value == 0)
             {
-                var neighbors = new Vector2Int[8];
+                const int neighborCount = 8;
+                var neighbors = ArrayPool<Vector2Int>.Get(neighborCount);
                 LevelUtility.GetAdjacentCellsSquare(pos, neighbors);
-                foreach (Vector2Int nPos in neighbors)
+                for (int i = 0; i < neighborCount; i++)
                 {
+                    Vector2Int nPos = neighbors[i];
                     RevealCellsRecursively(level, nPos.x, nPos.y, revealList);
                 }
+                
+                ArrayPool<Vector2Int>.Release(neighbors);
             }
         }
     }
