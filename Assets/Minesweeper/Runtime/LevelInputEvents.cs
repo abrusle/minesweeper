@@ -21,11 +21,14 @@ namespace Minesweeper.Runtime
         [SerializeField] private new Camera camera;
         [SerializeField] private Grid levelGrid;
         [SerializeField, CanBeNull] private LevelSettings levelSettings;
-        
+        [SerializeField] private KeyCode frameKey = KeyCode.F;
 
         [Space]
         [SerializeField, Tooltip("Invoked when the mouse hovers over a new cell.")]
         private UnityEvent<Vector2Int?> onCellHovered;
+        
+        [SerializeField, Tooltip("Move the camera to frame the entire level area.")]
+        private UnityEvent onFrameAction;
 
         private Vector2Int _currentCursorGridPos;
         private Vector3 _freeCursorPosition;
@@ -69,6 +72,11 @@ namespace Minesweeper.Runtime
             }
 
             base.Update();
+
+            if (UnityEngine.Input.GetKeyUp(frameKey))
+            {
+                onFrameAction.Invoke();
+            }
         }
 
         /// <inheritdoc />

@@ -16,7 +16,7 @@ namespace Minesweeper.Runtime.Infinite
     }
     
     [DisallowMultipleComponent]
-    public sealed class InfiniteLevelDataManager : MonoBehaviour
+    public sealed partial class InfiniteLevelDataManager : MonoBehaviour
     {
         public event Action<Vector2Int, CellStatusFlags> CellStatusChanged;
 
@@ -26,11 +26,7 @@ namespace Minesweeper.Runtime.Infinite
         [SerializeField, Range(0, 1)] private float mineDensity = 0.65f;
         
         [NonSerialized] private readonly Dictionary<Vector2Int, CellStatusFlags> _generatedCells = new();
-        [NonSerialized] private BoundsInt _generatedBounds = new()
-        {
-            min = new Vector3Int(int.MaxValue, int.MaxValue, 0),
-            max = new Vector3Int(int.MinValue, int.MinValue, 0),
-        };
+        [NonSerialized] private BoundsInt _generatedBounds;
 
         [PublicAPI] public bool IsCellGenerated(Vector2Int coords)
         {
@@ -151,7 +147,7 @@ namespace Minesweeper.Runtime.Infinite
                 _generatedBounds.yMax = y;
         }
 
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
         private void Reset()
         {
             seed = new System.Random().Next();

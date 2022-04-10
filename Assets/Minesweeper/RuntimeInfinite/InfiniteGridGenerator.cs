@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using Minesweeper.Runtime.Views;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Minesweeper.Runtime.Infinite
 {
@@ -14,7 +16,7 @@ namespace Minesweeper.Runtime.Infinite
         
         [Header("References")]
         [SerializeField] private Grid grid;
-        [SerializeField] private CameraController cameraController;
+        [SerializeField] private GameInfiniteCamera gameCam;
         [SerializeField] private InfiniteLevelDataManager levelDataManager;
         [SerializeField] private CellViewHandler cellViewHandler;
 
@@ -51,7 +53,7 @@ namespace Minesweeper.Runtime.Infinite
 
         private void Update()
         {
-            var viewRect = _viewRect = cameraController.WorldRect;
+            var viewRect = _viewRect = gameCam.WorldRect;
             Vector3Int min = grid.WorldToCell(viewRect.min);
             Vector3Int max = grid.WorldToCell(viewRect.max);
 
@@ -164,6 +166,23 @@ namespace Minesweeper.Runtime.Infinite
         {
             var cellStatus = levelDataManager.IsCellGenerated(cellPosition) ? levelDataManager.GetCellStatus(cellPosition) : CellStatusFlags.None;
             cellViewHandler.UpdateInstance(cellInstance.GetComponent<CellView>(), cellPosition, cellStatus);
+        }
+
+        [UsedImplicitly] // Input Event
+        public void FrameActiveArea()
+        {
+            BoundsInt coordsBounds = levelDataManager.Bounds;
+            Vector3 offest = (grid.cellSize + grid.cellGap) * 0.5f;
+            Vector3 min = grid.GetCellCenterWorld(coordsBounds.min) - offest;
+            Vector3 max = grid.GetCellCenterWorld(coordsBounds.max) + offest;
+
+            var worldRect = new Rect
+            {
+                min = min,
+                max = max
+            };
+            
+            gameCam.FrameArea(worldRect);
         }
 
         #if UNITY_EDITOR

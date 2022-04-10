@@ -467,7 +467,7 @@ MonoBehaviour:
   cellPrefab: {fileID: 1779904184744598856, guid: d7e901013c2586644a8afb0aa1ca6fbb,
     type: 3}
   grid: {fileID: 1423344561}
-  cameraController: {fileID: 2063575399}
+  gameCam: {fileID: 2063575399}
   levelDataManager: {fileID: 1417977436}
   cellViewHandler: {fileID: 1423344562}
   cleanIntervalDuration: 0.25
@@ -599,7 +599,7 @@ Camera:
   far clip plane: 50
   field of view: 60
   orthographic: 1
-  orthographic size: 6
+  orthographic size: 10
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -642,6 +642,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4b99644d2df45cc8fe365376d8adca0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sizeMin: 2
+  sizeMax: 10
+  _transitionTime: 0.25
 --- !u!1 &2069400146
 GameObject:
   m_ObjectHideFlags: 0
@@ -690,9 +693,26 @@ MonoBehaviour:
   camera: {fileID: 2063575397}
   levelGrid: {fileID: 1423344561}
   levelSettings: {fileID: 0}
+  frameKey: 102
   onCellHovered:
     m_PersistentCalls:
       m_Calls: []
+  onFrameAction:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1423344559}
+        m_TargetAssemblyTypeName: Minesweeper.Runtime.Infinite.InfiniteGridGenerator,
+          Minesweeper.Runtime.Infinite
+        m_MethodName: FrameActiveArea
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   normalClick:
     onSelected:
       m_PersistentCalls:
