@@ -22,6 +22,12 @@ namespace Minesweeper.Runtime.Infinite
                     : colorSheet.unrevealedCellColor;
         }
 
+        private void SetMineMode(CellView view, bool isMineMode)
+        {
+            view.textMesh.enabled = !isMineMode;
+            view.mineSprite.enabled = isMineMode;
+        }
+
         public void UpdateInstance(CellView view, Vector2Int coords, CellStatusFlags cellStatus)
         {
             if (view == null) return;
@@ -40,11 +46,11 @@ namespace Minesweeper.Runtime.Infinite
             {
                 if (cellStatus.HasFlag(CellStatusFlags.HasMine))
                 {
-                    view.textMesh.text = "*";
-                    view.textMesh.color = colorSheet.mineColor;
+                    SetMineMode(view, true);
                 }
                 else
                 {
+                    SetMineMode(view, false);
                     const int neighborCount = 8;
                     var neighbors = ArrayPool<Vector2Int>.Get(neighborCount);
                     LevelUtility.GetAdjacentCellsSquare(coords, neighbors);
@@ -63,6 +69,10 @@ namespace Minesweeper.Runtime.Infinite
                     view.textMesh.text = cellValue == 0 ? "" : cellValue.ToString();
                     view.textMesh.color = colorSheet.GetColorForCellValue(cellValue);
                 }
+            }
+            else
+            {
+                view.mineSprite.enabled = false;
             }
         }
         

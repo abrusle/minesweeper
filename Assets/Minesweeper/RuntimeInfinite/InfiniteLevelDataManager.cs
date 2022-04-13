@@ -28,6 +28,16 @@ namespace Minesweeper.Runtime.Infinite
         [NonSerialized] private readonly Dictionary<Vector2Int, CellStatusFlags> _generatedCells = new();
         [NonSerialized] private BoundsInt _generatedBounds;
 
+        private void Awake()
+        {
+#if UNITY_EDITOR
+            if (UnityEditor.EditorPrefs.GetBool("Minesweeper/Infinite/Auto Regenerate Seed", false))
+#endif
+            {
+                seed = GetRandomSeed();
+            }
+        }
+
         [PublicAPI] public void Clear()
         {
             foreach (var (coord, status) in _generatedCells)
@@ -159,10 +169,15 @@ namespace Minesweeper.Runtime.Infinite
                 _generatedBounds.yMax = y;
         }
 
-        #if UNITY_EDITOR
+        private static int GetRandomSeed()
+        {
+            return UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+        }
+
+#if UNITY_EDITOR
         private void Reset()
         {
-            seed = new System.Random().Next();
+            seed = GetRandomSeed();
         }
 #endif
     }

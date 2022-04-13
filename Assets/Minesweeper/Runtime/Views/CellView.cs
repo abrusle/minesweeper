@@ -1,15 +1,14 @@
 ﻿using Minesweeper.Runtime.Animation;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Minesweeper.Runtime.Views
 {
     public class CellView : MonoBehaviour
     {
         public TextMeshPro textMesh;
-        [FormerlySerializedAs("maskingSprite")]
         public SpriteRenderer backgroundSprite;
+        public SpriteRenderer mineSprite;
 
         [SerializeField] private Animator flagAnimator;
         [SerializeField] private Animator mainAnimator;

@@ -109,6 +109,7 @@ namespace Minesweeper.Runtime.Views
             _cellViews[x, y] = cellView;
             cellView.textMesh.text = string.Empty;
             cellView.textMesh.enabled = false;
+            cellView.mineSprite.enabled = false;
             cellView.backgroundSprite.color = colorSheet.unrevealedCellColor;
         }
 
@@ -143,16 +144,17 @@ namespace Minesweeper.Runtime.Views
 
             if (datum.cell.value != 0)
             {
-                cellView.textMesh.text = datum.cell.hasMine ? "*" : datum.cell.value.ToString();
-                if (!datum.cell.hasMine)
-                    cellView.textMesh.color = colorSheet.GetColorForCellValue(datum.cell.value);
+                if (datum.cell.hasMine)
+                {
+                    cellView.mineSprite.enabled = true;
+                    cellView.textMesh.enabled = false;
+                }
                 else
                 {
-                    cellView.textMesh.color = colorSheet.mineColor;
-                    cellView.textMesh.fontSize = 8;
+                    cellView.textMesh.text = datum.cell.value.ToString();
+                    cellView.textMesh.color = colorSheet.GetColorForCellValue(datum.cell.value);
+                    cellView.textMesh.enabled = true;
                 }
-                
-                cellView.textMesh.enabled = true;
             }
 
             cellView.backgroundSprite.color = colorSheet.revealedCellColor;
