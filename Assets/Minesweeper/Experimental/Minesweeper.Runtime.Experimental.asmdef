@@ -1,0 +1,16 @@
+{
+    "name": "Minesweeper.Runtime.Experimental",
+    "rootNamespace": "Minesweeper.Runtime.Experimental",
+    "references": [
+        "GUID:c21a968c2690f484d9173db9bdc4a3ef"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
