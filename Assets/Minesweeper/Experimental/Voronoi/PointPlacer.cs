@@ -1,20 +1,69 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
-namespace Minesweeper.Experimental.Voronoi
+namespace Minesweeper.Runtime.Experimental.Voronoi
 {
     [RequireComponent(typeof(Grid)), ExecuteAlways]
     public class PointPlacer : MonoBehaviour
     {
         public Vector2Int extents = new(1, 1);
-        [Range(0, 1)] public float divergance = 1;
-
-        public Transform _mockCursor;
+        [FormerlySerializedAs("divergance")] [Range(0, 1)] public float divergence = 1;
 
         private Grid _grid;
         private readonly Dictionary<Vector3Int, Vector3> _currentPoints = new();
+
+        public Grid Grid => _grid;
+        public IReadOnlyDictionary<Vector3Int, Vector3> CurrentPoints => _currentPoints;
+
+        private readonly Dictionary<Vector3Int, int> _highlightedCoords = new();
+
+        public void HighlightPoint(Vector3Int coords)
+        {
+            if (_highlightedCoords.ContainsKey(coords))
+            {
+                _highlightedCoords[coords]++;
+            }
+            else
+            {
+                _highlightedCoords[coords] = 1;
+            }
+        }
+
+        public void UnhighlightPoint(Vector3Int coords)
+        {
+            if (!_highlightedCoords.ContainsKey(coords)) return;
+            
+            _highlightedCoords[coords]--;
+            if (_highlightedCoords[coords] == 0)
+            {
+                _highlightedCoords.Remove(coords);
+            }
+        }
+        
+        public IEnumerable<Vector3Int> EnumerateCellsInRadius(Vector3Int center, int radius)
+        {
+            int xMin = center.x - radius;
+            int xMax = center.x + radius;
+            
+            int yMin = center.y - radius;
+            int yMax = center.y + radius;
+            
+            for (int x = xMin; x <= xMax; x++)
+            {
+                for (int y = yMin; y <= yMax; y++)
+                { 
+                    var cellCoords = new Vector3Int(x, y, center.z);
+                    if (_currentPoints.ContainsKey(cellCoords))
+                    {
+                        yield return cellCoords;
+                    }
+                }
+            }
+        }
 
         private void OnEnable()
         {
@@ -32,8 +81,8 @@ namespace Minesweeper.Experimental.Voronoi
         {
             Vector3 halfSize = _grid.cellSize * 0.5f;
 
-            PostProcessPointDelegate processPoint = divergance > float.Epsilon
-                ? ApplyDivergance
+            PostProcessPointDelegate processPoint = divergence > float.Epsilon
+                ? ApplyDivergence
                 : delegate { };
             
             for (int x = -extents.x; x < extents.x; x++)
@@ -47,38 +96,19 @@ namespace Minesweeper.Experimental.Voronoi
                 }
             }
 
-            void ApplyDivergance(ref Vector3 p)
+            void ApplyDivergence(ref Vector3 p)
             {
                 var diverted = p + new Vector3(
                     x: Random.Range(-halfSize.x, halfSize.x),
                     y: Random.Range(-halfSize.y, halfSize.y),
-                    z: Random.Range(-halfSize.z, halfSize.z));
-                p = Vector3.Lerp(p, diverted, divergance);
+                    z: 0/*Random.Range(-halfSize.z, halfSize.z)*/);
+                p = Vector3.Lerp(p, diverted, divergence);
             }
         }
 
         private delegate void PostProcessPointDelegate(ref Vector3 point);
 
-        private void GetCellsInRadius(Vector3Int center, int radius, IList<Vector3Int> surrounding)
-        {
-            int xMin = center.x - radius;
-            int xMax = center.x + radius;
-            
-            int yMin = center.y - radius;
-            int yMax = center.y + radius;
-            
-            for (int x = xMin; x <= xMax; x++)
-            {
-                for (int y = yMin; y <= yMax; y++)
-                {
-                    surrounding.Add(new Vector3Int(x, y, center.z));
-                }
-            }
-        }
-
 #if UNITY_EDITOR
-
-        private readonly List<Vector3Int> _debugCursorSurroundings = new ();
 
         private void OnDrawGizmos()
         {
@@ -87,35 +117,17 @@ namespace Minesweeper.Experimental.Voronoi
             Gizmos.color = Color.green;
             Gizmos.DrawWireCube(transform.position, max * 2);
 
-            Vector3Int cursorCell;
-            if (_mockCursor != null)
-            {
-                _debugCursorSurroundings.Clear();
-                cursorCell = _grid.WorldToCell(_mockCursor.position);
-                GetCellsInRadius(cursorCell, 2, _debugCursorSurroundings);
-            }
-            else
-            {
-                // a value that should never be present in the dictionary
-                cursorCell = new Vector3Int(int.MaxValue, int.MaxValue, int.MaxValue);
-            }
-
-            Gizmos.color = Color.cyan;
             float pointRadius = Mathf.Min(gridCellSize.x, gridCellSize.y) * 0.1f;
             
-            foreach (var (key, value) in _currentPoints)
+            foreach (var (coords, pointPosition) in _currentPoints)
             {
-                var color = Gizmos.color;
-                if (key == cursorCell || _debugCursorSurroundings.Contains(key))
-                {
-                    Gizmos.color = Color.magenta;
-                }
-                Gizmos.DrawWireSphere(value, pointRadius);
-                Gizmos.color = color;
+                Gizmos.color = _highlightedCoords.ContainsKey(coords) ? new Color(0.97f, 0.52f, 1f) : Color.cyan;
+                Gizmos.DrawWireSphere(pointPosition, pointRadius);
             }
         }
 
         [UnityEditor.MenuItem("CONTEXT/" + nameof(PointPlacer) + "/Refresh Computed Points")]
+        [SuppressMessage("ReSharper", "Unity.IncorrectMethodSignature")]
         private static void MenuItem_Refresh(UnityEditor.MenuCommand cmd)
         {
             if (cmd.context is PointPlacer pointPlacer)
