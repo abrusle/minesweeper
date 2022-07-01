@@ -1,5 +1,5 @@
-
 using System.Collections.Generic;
+using Minesweeper.Runtime.Math;
 using UnityEngine;
 
 namespace Minesweeper.Runtime.Experimental.Voronoi
@@ -7,45 +7,45 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
     public class CellMeshBuilder : MonoBehaviour
     {
         public PointPlacer pointPlacer;
-        public Vector3Int cellCoords;
 
-        private readonly List<Vector3Int> _cellCoordsList = new();
-        private bool _isDirty;
-
-        private Vector3Int _previousCellCoords;
+        // debug
+        public bool _drawIntersections;
+        public List<Line> _lines = new List<Line>();
         
-        private void OnEnable()
-        {
-            _isDirty = true;
-        }
-
-        private void OnValidate()
-        {
-            _isDirty = true;
-        }
+        
+        private Vector2Int _currentCellCoords;
+        private Vector2Int _previousCellCoords;
 
         private void OnDrawGizmos()
         {
             if (pointPlacer == null) return;
 
+            Vector2Int newCellCoords = (Vector2Int) pointPlacer.Grid.WorldToCell(transform.position);
+            if (newCellCoords != _currentCellCoords)
+            {
+                _previousCellCoords = _currentCellCoords;
+                _currentCellCoords = newCellCoords;
+                
+                pointPlacer.UnhighlightPoint(_previousCellCoords);
+                pointPlacer.HighlightPoint(_currentCellCoords);
+            }
+
             var points = pointPlacer.CurrentPoints;
-            if (!points.TryGetValue(cellCoords, out Vector3 pointPosition))
+            if (!points.TryGetValue(_currentCellCoords, out Vector3 pointPosition))
             {
                 return;
             }
-            
-            if (_isDirty)
-            {
-                pointPlacer.UnhighlightPoint(_previousCellCoords);
-                pointPlacer.HighlightPoint(cellCoords);
 
-                _previousCellCoords = cellCoords;
+            if (_drawIntersections)
+            {
+                _lines.Clear();
             }
-
+            var lines = _lines;
             Vector3 gridForward = pointPlacer.Grid.transform.forward;
-            foreach (Vector3Int coords in pointPlacer.EnumerateCellsInRadius(cellCoords, 2))
+            Vector2 cellSize = pointPlacer.Grid.cellSize + pointPlacer.Grid.cellGap;
+            foreach (Vector2Int coords in pointPlacer.EnumerateCellsInRadius(_currentCellCoords))
             {
-                if (coords == cellCoords)
+                if (coords == _currentCellCoords)
                     continue;
 
                 if (!points.TryGetValue(coords, out Vector3 position))
@@ -60,10 +60,34 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
                 // Gizmos.DrawLine(pointPosition, midPoint);
 
                 Vector3 direction = (position - pointPosition).normalized;
-                Vector3 weightedNormalDirection = Vector3.Cross(direction, gridForward) * 2.1f;
+                Vector3 normal = Vector3.Cross(direction, gridForward);
+                var line = new Line(normal, midPoint);
                 
+                line.GetSegment(cellSize.x * -pointPlacer.extents.x, cellSize.x * pointPlacer.extents.x, out var start, out var end);
                 Gizmos.color = new Color(0.79f, 1f, 0.57f, 0.8f);
-                Gizmos.DrawLine(midPoint + weightedNormalDirection, midPoint - weightedNormalDirection);
+                Gizmos.DrawLine(start, end);
+
+                if (!_drawIntersections)
+                    continue;
+                
+                lines.Add(line);
+            }
+
+            if (_drawIntersections)
+            {
+                Gizmos.color = Color.blue;
+                for (int i = 0, count = lines.Count; i < count; i++)
+                {
+                    for (int j = 0; j < count; j++)
+                    {
+                        if (j == i) continue;
+                        if (lines[i].TryGetIntersection(lines[j], out var intersection))
+                        {
+                            //Gizmos.DrawIcon(intersection, "hex", false, Gizmos.color);
+                            Gizmos.DrawLine(pointPosition, intersection);
+                        }
+                    }
+                }
             }
         }
     }

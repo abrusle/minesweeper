@@ -7,7 +7,7 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
     {
         public PointPlacer pointPlacer;
 
-        private Vector3Int? _previousClosestPointCoord;
+        private Vector2Int? _previousClosestPointCoord;
 
         private void Update()
         {
@@ -16,11 +16,11 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             var currentPoints = pointPlacer.CurrentPoints;
             Vector3 position = transform.position;
             
-            Vector3Int? closestPointCoord = null;
+            Vector2Int? closestPointCoord = null;
             float minSqrDistance = float.PositiveInfinity;
-            Vector3Int currentCell = pointPlacer.Grid.WorldToCell(position);
+            Vector2Int currentCell = (Vector2Int)pointPlacer.Grid.WorldToCell(position);
 
-            foreach (Vector3Int neighbor in pointPlacer.EnumerateCellsInRadius(currentCell, 2))
+            foreach (Vector2Int neighbor in pointPlacer.EnumerateCellsInRadius(currentCell))
             {
                 Vector3 point = currentPoints[neighbor];
                 float sqrDistance = SqrDistance(point, position);

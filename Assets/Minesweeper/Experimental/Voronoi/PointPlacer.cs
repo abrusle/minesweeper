@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace Minesweeper.Runtime.Experimental.Voronoi
@@ -11,17 +9,17 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
     public class PointPlacer : MonoBehaviour
     {
         public Vector2Int extents = new(1, 1);
-        [FormerlySerializedAs("divergance")] [Range(0, 1)] public float divergence = 1;
+        [Range(0, 1)] public float divergence = 1;
 
         private Grid _grid;
-        private readonly Dictionary<Vector3Int, Vector3> _currentPoints = new();
+        private readonly Dictionary<Vector2Int, Vector3> _currentPoints = new();
 
         public Grid Grid => _grid;
-        public IReadOnlyDictionary<Vector3Int, Vector3> CurrentPoints => _currentPoints;
+        public IReadOnlyDictionary<Vector2Int, Vector3> CurrentPoints => _currentPoints;
 
-        private readonly Dictionary<Vector3Int, int> _highlightedCoords = new();
+        private readonly Dictionary<Vector2Int, int> _highlightedCoords = new();
 
-        public void HighlightPoint(Vector3Int coords)
+        public void HighlightPoint(Vector2Int coords)
         {
             if (_highlightedCoords.ContainsKey(coords))
             {
@@ -33,7 +31,7 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             }
         }
 
-        public void UnhighlightPoint(Vector3Int coords)
+        public void UnhighlightPoint(Vector2Int coords)
         {
             if (!_highlightedCoords.ContainsKey(coords)) return;
             
@@ -44,7 +42,7 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             }
         }
         
-        public IEnumerable<Vector3Int> EnumerateCellsInRadius(Vector3Int center, int radius)
+        public IEnumerable<Vector2Int> EnumerateCellsInRadius(Vector2Int center, int radius = 1)
         {
             int xMin = center.x - radius;
             int xMax = center.x + radius;
@@ -56,7 +54,7 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             {
                 for (int y = yMin; y <= yMax; y++)
                 { 
-                    var cellCoords = new Vector3Int(x, y, center.z);
+                    var cellCoords = new Vector2Int(x, y);
                     if (_currentPoints.ContainsKey(cellCoords))
                     {
                         yield return cellCoords;
@@ -68,7 +66,6 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
         private void OnEnable()
         {
             _grid ??= gameObject.GetComponent<Grid>();
-            RefreshComputedPoints();
         }
 
         private void RefreshComputedPoints()
@@ -77,7 +74,7 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             ComputePoints(_currentPoints);
         }
 
-        private void ComputePoints(IDictionary<Vector3Int, Vector3> points)
+        private void ComputePoints(IDictionary<Vector2Int, Vector3> points)
         {
             Vector3 halfSize = _grid.cellSize * 0.5f;
 
@@ -89,8 +86,8 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             {
                 for (int y = -extents.y; y < extents.y; y++)
                 {
-                    Vector3Int index = new Vector3Int(x, y, 0);
-                    Vector3 point = _grid.GetCellCenterWorld(index);
+                    Vector2Int index = new Vector2Int(x, y);
+                    Vector3 point = _grid.GetCellCenterWorld((Vector3Int)index);
                     processPoint(ref point);
                     points.Add(index, point);
                 }
@@ -128,7 +125,7 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
 
         [UnityEditor.MenuItem("CONTEXT/" + nameof(PointPlacer) + "/Refresh Computed Points")]
         [SuppressMessage("ReSharper", "Unity.IncorrectMethodSignature")]
-        private static void MenuItem_Refresh(UnityEditor.MenuCommand cmd)
+        private static void MenuItemContext_Refresh(UnityEditor.MenuCommand cmd)
         {
             if (cmd.context is PointPlacer pointPlacer)
             {
@@ -136,9 +133,19 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             }
         }
 
-        private void OnValidate()
+        [UnityEditor.MenuItem("Minesweeper/Voronoi/Debug/Refresh Computed Points", isValidateFunction:false)]
+        private static void MenuItem_Refresh()
         {
-            //RefreshComputedPoints();
+            var pointPlacer = FindObjectOfType<PointPlacer>();
+            if (pointPlacer == null)
+            {
+                Debug.Log("Not Point Placer found.");
+            }
+            else
+            {
+                pointPlacer.RefreshComputedPoints();
+                Debug.Log("Refreshed Computed Points for " + pointPlacer, pointPlacer);
+            }
         }
 #endif
 
