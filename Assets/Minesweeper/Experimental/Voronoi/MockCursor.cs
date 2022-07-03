@@ -1,3 +1,4 @@
+using Minesweeper.Runtime.Math;
 using UnityEngine;
 
 namespace Minesweeper.Runtime.Experimental.Voronoi
@@ -23,7 +24,7 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             foreach (Vector2Int neighbor in pointPlacer.EnumerateCellsInRadius(currentCell))
             {
                 Vector3 point = currentPoints[neighbor];
-                float sqrDistance = SqrDistance(point, position);
+                float sqrDistance = MathUtility.SqrDistance(point, position);
                 
                 if (sqrDistance < minSqrDistance)
                 {
@@ -50,14 +51,6 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             {
                 Debug.DrawLine(position, currentPoints[closestPointCoord.Value], Color.yellow);
             }
-        }
-        
-        static float SqrDistance(Vector3 a, Vector3 b)
-        {
-            float num1 = a.x - b.x;
-            float num2 = a.y - b.y;
-            float num3 = a.z - b.z;
-            return (float) (num1 * (double) num1 + num2 * (double) num2 + num3 * (double) num3);
         }
     }
 }

@@ -148,7 +148,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 81652425}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.46, y: -5.551, z: 0}
+  m_LocalPosition: {x: -4.416, y: -5.579, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -168,24 +168,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointPlacer: {fileID: 1196673157}
-  _drawIntersections: 1
-  _lines:
-  - m: -0.9453418
-    b: -11.804137
-  - m: 37.147728
-    b: 225.35104
-  - m: 1.7119151
-    b: 5.464814
-  - m: 0.016423844
-    b: -6.0394044
-  - m: -0.41519466
-    b: -7.228697
-  - m: 1.6204969
-    b: 2.6129186
-  - m: -2.744341
-    b: -18.61863
-  - m: -1.8593116
-    b: -14.35205
+  drawInner: 0
+  drawOuter: 1
+  drawMidLines: 0
 --- !u!1 &679159441
 GameObject:
   m_ObjectHideFlags: 0
