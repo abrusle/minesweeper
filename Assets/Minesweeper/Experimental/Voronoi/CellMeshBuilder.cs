@@ -15,13 +15,13 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             drawMidLines = true;
 
         // debug
-        List<Line> _lines = new ();
-        List<IntersectionData> _intersectionPoints = new();
-        Vector3 _currentCellPoint;
+        private List<Line> _lines = new ();
+        private List<IntersectionData> _intersectionPoints = new();
+        private Vector3 _currentCellPoint;
 
-        Vector2Int _currentCellCoords;
-        Vector2Int _previousCellCoords;
-        bool _meshRebuildNeeded;
+        private Vector2Int _currentCellCoords;
+        private Vector2Int _previousCellCoords;
+        private bool _meshRebuildNeeded;
 
         private void Update()
         {
@@ -82,7 +82,9 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             }
 
             float maxSqrDistance = (grid.cellSize.sqrMagnitude + grid.cellGap.sqrMagnitude) * 2;
-            
+
+            HashSet<(int, int)> computedIndices = new();
+
             // Compute all the intersections between the lines.
             _intersectionPoints.Clear();
             for (int i = 0, count = _lines.Count; i < count; i++)
@@ -90,6 +92,12 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
                 for (int j = 0; j < count; j++)
                 {
                     if (j == i) continue;
+
+                    (int, int) indices = (Mathf.Min(i, j), Mathf.Max(i, j));
+                    if (computedIndices.Contains(indices))
+                        continue;
+                    computedIndices.Add(indices);
+
                     if (_lines[i].TryGetIntersection(_lines[j], out Vector2 intersection))
                     {
                         if (MathUtility.SqrDistance((Vector2) pointPosition, intersection) > maxSqrDistance)
@@ -118,9 +126,9 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
                     if (!centerToIntersectionLine.TryGetIntersection(_lines[l], out Vector2 intersectionToCenter))
                         continue;
                     
-                    bool isIntersectionBad = intersectionToCenter.x >= min.x && intersectionToCenter.x <= max.x &&
+                    bool isOnSegment = intersectionToCenter.x >= min.x && intersectionToCenter.x <= max.x &&
                                              intersectionToCenter.y >= min.y && intersectionToCenter.y <= max.y;
-                    if (!isIntersectionBad)
+                    if (!isOnSegment)
                         continue;
                     
                     remove = true;

@@ -1,7 +1,7 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
 using UnityEngine;
+// ReSharper disable InconsistentNaming
 
 namespace Minesweeper.Tests
 {
@@ -21,8 +21,25 @@ namespace Minesweeper.Tests
             bool hasIntersection = lineA.TryGetIntersection(in lineB, out Vector2 intersection, tolerance);
             
             Assert.IsTrue(hasIntersection);
-            Assert.IsTrue(Math.Abs(intersection.x - expectedIntersection.x) < tolerance);
-            Assert.IsTrue(Math.Abs(intersection.y - expectedIntersection.y) < tolerance);
+            AssertUtility.AreClose(intersection, expectedIntersection, tolerance);
+        }
+
+        [Test]
+        public static void Intersection2WayTest()
+        {
+            var lineA = new Line(2.5f, -12.3f);
+            var lineB = new Line(-0.4f, 320.2f);
+            var expectedIntersection = new Vector2(114.6551724137931f, 274.3379310344828f);
+            const float tolerance = 1e-13f;
+
+            bool hasIntersectionAB = lineA.TryGetIntersection(in lineB, out Vector2 intersectionAB, tolerance);
+            bool hasIntersectionBA = lineB.TryGetIntersection(in lineA, out Vector2 intersectionBA, tolerance);
+            
+            Assert.IsTrue(hasIntersectionAB);
+            Assert.IsTrue(hasIntersectionBA);
+            AssertUtility.AreClose(intersectionAB, intersectionBA, tolerance);
+            AssertUtility.AreClose(expectedIntersection, intersectionBA, tolerance);
+            AssertUtility.AreClose(expectedIntersection,intersectionAB, tolerance);
         }
 
         [Test]
@@ -38,8 +55,8 @@ namespace Minesweeper.Tests
 
             Debug.Log("Computed " + line);
             Debug.Log("Expected " + expected);
-            Assert.IsTrue(Math.Abs(line.m - expected.m) < tolerance);
-            Assert.IsTrue(Math.Abs(line.b - expected.b) < tolerance);
+            AssertUtility.AreClose(line.m, expected.m, tolerance);
+            AssertUtility.AreClose(line.b, expected.b, tolerance);
         }
         
         [Test]
@@ -55,8 +72,8 @@ namespace Minesweeper.Tests
 
             Debug.Log("Computed " + line);
             Debug.Log("Expected " + expected);
-            Assert.IsTrue(Math.Abs(line.m - expected.m) < tolerance);
-            Assert.IsTrue(Math.Abs(line.b - expected.b) < tolerance);
+            AssertUtility.AreClose(line.m, expected.m, tolerance);
+            AssertUtility.AreClose(line.b, expected.b, tolerance);
         }
         
         [Test]
@@ -119,8 +136,8 @@ namespace Minesweeper.Tests
 
             var expected = new Line(1.4358974358974f, 366.141076087609f);
             
-            Assert.IsTrue(Math.Abs(line.m - expected.m) < tolerance);
-            Assert.IsTrue(Math.Abs(line.b - expected.b) < tolerance);
+            AssertUtility.AreClose(line.m, expected.m, tolerance);
+            AssertUtility.AreClose(line.b, expected.b, tolerance);
             Debug.Log("Computed " + line.ToString("F9"));
             Debug.Log("Expected " + expected.ToString("F9"));
         }
