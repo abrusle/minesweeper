@@ -23,6 +23,25 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
         private Vector2Int _previousCellCoords;
         private bool _meshRebuildNeeded;
 
+        private void OnEnable()
+        {
+            if (pointPlacer != null)
+            {
+                pointPlacer.OnPointsGenerated += OnPointsChanged;
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (pointPlacer != null)
+                pointPlacer.OnPointsGenerated -= OnPointsChanged;
+        }
+
+        private void OnPointsChanged()
+        {
+            _meshRebuildNeeded = true;
+        }
+
         private void Update()
         {
             if (pointPlacer != null)
@@ -66,7 +85,7 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             
             // Foreach point in neighboring cells, build and memorize
             // a line which is orthogonal to the segment between that point and pointPosition, passing through their midPoint.
-            foreach (Vector2Int coords in pointPlacer.EnumerateCellsInRadius(centerCellCoords))
+            foreach (Vector2Int coords in pointPlacer.EnumerateCellsInRadius(centerCellCoords, 2))
             {
                 if (coords == centerCellCoords)
                     continue;
@@ -102,8 +121,8 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
                     {
                         if (MathUtility.SqrDistance((Vector2) pointPosition, intersection) > maxSqrDistance)
                             continue;
-                        
-                        _intersectionPoints.Add(new IntersectionData(i, j, intersection));
+                        float angle = Vector2.SignedAngle(intersection - (Vector2)pointPosition, Vector2.right);
+                        _intersectionPoints.Add(new IntersectionData(i, j, intersection, angle));
                     }
                 }
             }
@@ -127,7 +146,7 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
                         continue;
                     
                     bool isOnSegment = intersectionToCenter.x >= min.x && intersectionToCenter.x <= max.x &&
-                                             intersectionToCenter.y >= min.y && intersectionToCenter.y <= max.y;
+                                       intersectionToCenter.y >= min.y && intersectionToCenter.y <= max.y;
                     if (!isOnSegment)
                         continue;
                     
@@ -143,25 +162,21 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             
             // Sort intersection points according to their direction/angle so that we can
             // loop over the intersection points in clockwiser (or counter-clockwise) order.
-            _intersectionPoints.Sort((idA, idB) =>
-            {
-                var zero = new Vector2(0, 0);
-                float a = Vector2.Dot(idA.position, zero);
-                float b = Vector2.Dot(idB.position, zero);
-                return a.CompareTo(b);
-            });
+            _intersectionPoints.Sort((idA, idB) => idA.angle.CompareTo(idB.angle));
         }
 
         private readonly struct IntersectionData
         {
             public readonly int lineIndexA, lineIndexB;
             public readonly Vector2 position;
+            public readonly float angle;
 
-            public IntersectionData(int lineIndexA, int lineIndexB, Vector2 position)
+            public IntersectionData(int lineIndexA, int lineIndexB, Vector2 position, float angle)
             {
                 this.lineIndexA = lineIndexA;
                 this.lineIndexB = lineIndexB;
                 this.position = position;
+                this.angle = angle;
             }
         }
 
@@ -171,7 +186,7 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             
             if (drawMidLines)
             {
-                Gizmos.color = new Color(0.79f, 1f, 0.57f, 0.5f);
+                Gizmos.color = new Color(0.79f, 1f, 0.57f, 0.25f);
                 for (int i = 0, count = _lines.Count; i < count; i++)
                 {
                     _lines[i].GetSegment(
@@ -189,15 +204,19 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
                 Vector3 centerPos = _currentCellPoint;
                 for (int i = 0, count = _intersectionPoints.Count; i < count; i++)
                 {
-                    Vector2 iPosition = _intersectionPoints[i].position;
+                    IntersectionData intersection = _intersectionPoints[i];
+                    Vector2 iPosition = intersection.position;
                     if (drawInner)
                     {
                         Gizmos.DrawLine(centerPos, iPosition);
                     }
 
-                    if (i > 0 && drawOuter)
+                    UnityEditor.Handles.color = Gizmos.color;
+                    UnityEditor.Handles.Label(iPosition, $"{intersection.angle:F3}°");
+                    
+                    if (drawOuter)
                     {
-                        Gizmos.DrawLine(iPosition, _intersectionPoints[i - 1].position);
+                        Gizmos.DrawLine(iPosition, _intersectionPoints[(i == 0 ? count : i) - 1].position);
                     }
                 }
             }

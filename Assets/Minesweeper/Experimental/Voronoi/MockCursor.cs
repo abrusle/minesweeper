@@ -21,7 +21,7 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             float minSqrDistance = float.PositiveInfinity;
             Vector2Int currentCell = (Vector2Int)pointPlacer.Grid.WorldToCell(position);
 
-            foreach (Vector2Int neighbor in pointPlacer.EnumerateCellsInRadius(currentCell))
+            foreach (Vector2Int neighbor in pointPlacer.EnumerateCellsInRadius(currentCell, 2))
             {
                 Vector3 point = currentPoints[neighbor];
                 float sqrDistance = MathUtility.SqrDistance(point, position);

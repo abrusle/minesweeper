@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -18,6 +19,7 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
         public IReadOnlyDictionary<Vector2Int, Vector3> CurrentPoints => _currentPoints;
 
         private readonly Dictionary<Vector2Int, int> _highlightedCoords = new();
+        public event Action OnPointsGenerated;
 
         public void HighlightPoint(Vector2Int coords)
         {
@@ -72,6 +74,7 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
         {
             _currentPoints.Clear();
             ComputePoints(_currentPoints);
+            OnPointsGenerated?.Invoke();
         }
 
         private void ComputePoints(IDictionary<Vector2Int, Vector3> points)
