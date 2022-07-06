@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using Minesweeper.Runtime.Math;
 using UnityEngine;
+using UnityEngine.Assertions;
+using UnityEngine.Pool;
+using UnityEngine.Rendering;
 
 namespace Minesweeper.Runtime.Experimental.Voronoi
 {
@@ -8,6 +11,7 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
     public class CellMeshBuilder : MonoBehaviour
     {
         public PointPlacer pointPlacer;
+        public MeshFilter targetMeshFilter;
 
         public bool 
             drawInner = true,
@@ -65,6 +69,18 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             if (_meshRebuildNeeded)
             {
                 BuildMeshData(_currentCellCoords);
+                if (targetMeshFilter != null)
+                {
+                    var mesh = targetMeshFilter.sharedMesh;
+                    if (mesh == null)
+                    {
+                        mesh = new Mesh();
+                        mesh.name = "Cell " + _currentCellCoords;
+                        targetMeshFilter.sharedMesh = mesh;
+                    }
+
+                    FillMesh(mesh, targetMeshFilter.transform.worldToLocalMatrix);
+                }
                 _meshRebuildNeeded = false;
             }
         }
@@ -82,6 +98,8 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             _lines.Clear();
             Grid grid = pointPlacer.Grid;
             Vector3 gridForward = grid.transform.forward;
+            
+            // TODO : add lines corresponding to the edges/bounds of pointPlacer.
             
             // Foreach point in neighboring cells, build and memorize
             // a line which is orthogonal to the segment between that point and pointPosition, passing through their midPoint.
@@ -178,6 +196,40 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
                 this.position = position;
                 this.angle = angle;
             }
+        }
+
+        private void FillMesh(Mesh mesh, Matrix4x4 worldToLocalMatrix)
+        {
+            int count = _intersectionPoints.Count;
+            if (count < 2)
+                return;
+
+            var vertices = ListPool<Vector3>.Get();
+            var tris = ListPool<int>.Get();
+
+            for (int i = 0; i < count; i++)
+            {
+                Vector2 p = worldToLocalMatrix.MultiplyPoint(_intersectionPoints[i].position);
+                vertices.Add(p);
+
+                if (i < 2)
+                    continue;
+
+                tris.Add(0);
+                tris.Add(i - 1);
+                tris.Add(i);
+            }
+
+            if (vertices.Count != mesh.vertexCount)
+            {
+                mesh.Clear();
+            }
+
+            mesh.SetVertices(vertices, 0, count, MeshUpdateFlags.Default);
+            mesh.SetTriangles(tris, 0, true, 0);
+
+            ListPool<Vector3>.Release(vertices);
+            ListPool<int>.Release(tris);
         }
 
         private void OnDrawGizmos()
