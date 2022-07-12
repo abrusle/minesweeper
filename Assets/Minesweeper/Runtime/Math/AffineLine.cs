@@ -7,7 +7,7 @@ namespace Minesweeper.Runtime.Math
     using Maths = System.Math;
     
     [Serializable]
-    public struct Line
+    public struct AffineLine
     {
         private const float DefaultTolerance = 1E-13f;
         
@@ -25,13 +25,13 @@ namespace Minesweeper.Runtime.Math
             get => new Vector2(-m, 1);
         }
 
-        public Line(float m, float b)
+        public AffineLine(float m, float b)
         {
             this.m = m;
             this.b = b;
         }
 
-        public Line(in Vector2 tangent, in Vector2 point, float tolerance = DefaultTolerance)
+        public AffineLine(in Vector2 tangent, in Vector2 point, float tolerance = DefaultTolerance)
         {
             m = Maths.Abs(tangent.x) < tolerance ? 0 : tangent.y / tangent.x;
             b = point.y - m * point.x;
@@ -53,7 +53,7 @@ namespace Minesweeper.Runtime.Math
             end = GetPoint(xMax);
         }
 
-        public readonly bool TryGetIntersection(in Line other, out Vector2 intersection, float tolerance = DefaultTolerance)
+        public readonly bool TryGetIntersection(in AffineLine other, out Vector2 intersection, float tolerance = DefaultTolerance)
         {
             float slopeDiff = m - other.m;
             if (Maths.Abs(slopeDiff) < tolerance)
@@ -79,15 +79,15 @@ namespace Minesweeper.Runtime.Math
             return GetY(point.x) < point.y;
         }
 
-        public readonly bool Approximately(in Line other)
+        public readonly bool Approximately(in AffineLine other)
         {
             return Mathf.Approximately(m, other.m) && Mathf.Approximately(b, other.b);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly Line GetOrthogonalLine(float intersectionX)
+        public readonly AffineLine GetOrthogonalLine(float intersectionX)
         {
-            return new Line(Normal, GetPoint(intersectionX));
+            return new AffineLine(Normal, GetPoint(intersectionX));
         }
 
         public readonly override string ToString()
@@ -99,12 +99,12 @@ namespace Minesweeper.Runtime.Math
             return string.Format("Line (y = {0}x {1} {2})", m.ToString(format), b < 0 ? "" : "+", b.ToString(format));
         }
 
-        public static Line CreateFromPoints(Vector2 pointA, Vector2 pointB, float tolerance = DefaultTolerance)
+        public static AffineLine CreateFromPoints(Vector2 pointA, Vector2 pointB, float tolerance = DefaultTolerance)
         {
             Vector2 diff = pointB - pointA;
             float m = Maths.Abs(diff.x) < tolerance ? float.PositiveInfinity : diff.y / diff.x;
             float b = pointA.y - m * pointA.x;
-            return new Line(m, b);
+            return new AffineLine(m, b);
         }
     }
 }

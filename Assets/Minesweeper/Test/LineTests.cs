@@ -13,8 +13,8 @@ namespace Minesweeper.Tests
         [Test]
         public static void IntersectionTest()
         {
-            var lineA = new Line(2.5f, -12.3f);
-            var lineB = new Line(-0.4f, 320.2f);
+            var lineA = new AffineLine(2.5f, -12.3f);
+            var lineB = new AffineLine(-0.4f, 320.2f);
             var expectedIntersection = new Vector2(114.6551724137931f, 274.3379310344828f);
             const float tolerance = 1e-13f;
 
@@ -27,8 +27,8 @@ namespace Minesweeper.Tests
         [Test]
         public static void Intersection2WayTest()
         {
-            var lineA = new Line(2.5f, -12.3f);
-            var lineB = new Line(-0.4f, 320.2f);
+            var lineA = new AffineLine(2.5f, -12.3f);
+            var lineB = new AffineLine(-0.4f, 320.2f);
             var expectedIntersection = new Vector2(114.6551724137931f, 274.3379310344828f);
             const float tolerance = 1e-13f;
 
@@ -48,10 +48,10 @@ namespace Minesweeper.Tests
             Vector2 
                 pointA = new (-0.6224586514781f, -8.8478204839917f),
                 pointB = new (0.9338690981249f, 1.6729551033246f);
-            var expected = new Line(6.76f, -4.64f);
+            var expected = new AffineLine(6.76f, -4.64f);
             const float tolerance = 1e-5f;
 
-            var line = Line.CreateFromPoints(pointA, pointB, tolerance);
+            var line = AffineLine.CreateFromPoints(pointA, pointB, tolerance);
 
             Debug.Log("Computed " + line);
             Debug.Log("Expected " + expected);
@@ -65,10 +65,10 @@ namespace Minesweeper.Tests
             Vector2 
                 pointA = new (-21.6224586514781f, 224.0736f),
                 pointB = new (76.9338690981249f, 224.0736f);
-            var expected = new Line(0, 224.0736f);
+            var expected = new AffineLine(0, 224.0736f);
             const float tolerance = 1e-13f;
 
-            var line = Line.CreateFromPoints(pointA, pointB, tolerance);
+            var line = AffineLine.CreateFromPoints(pointA, pointB, tolerance);
 
             Debug.Log("Computed " + line);
             Debug.Log("Expected " + expected);
@@ -85,7 +85,7 @@ namespace Minesweeper.Tests
             
             const float tolerance = 1e-13f;
 
-            var line = Line.CreateFromPoints(pointA, pointB, tolerance);
+            var line = AffineLine.CreateFromPoints(pointA, pointB, tolerance);
 
             Debug.Log("Computed " + line);
             Assert.IsTrue(float.IsPositiveInfinity(line.m));
@@ -95,7 +95,7 @@ namespace Minesweeper.Tests
         [Test]
         public static void IsOnLineTest()
         {
-            var line = new Line(2.5f, -12.3f);
+            var line = new AffineLine(2.5f, -12.3f);
             var pointThatIsOnTheLine = new Vector2(4.92f, 0);
             const float tolerance = 1E-13f;
             
@@ -106,7 +106,7 @@ namespace Minesweeper.Tests
         [Test]
         public static void IsAlmostOnLineTest()
         {
-            var line = new Line(2.5f, -12.3f);
+            var line = new AffineLine(2.5f, -12.3f);
             var pointThatIsOnTheLine = new Vector2(4.923f, 0.01f);
             const float tolerance = 1E-13f;
             
@@ -117,7 +117,7 @@ namespace Minesweeper.Tests
         [Test]
         public static void IsNotOnLineTest()
         {
-            var line = new Line(2.5f, -12.3f);
+            var line = new AffineLine(2.5f, -12.3f);
             var pointThatIsOnTheLine = new Vector2(-49.276f, 74.217f);
             const float tolerance = 1E-13f;
             
@@ -132,9 +132,9 @@ namespace Minesweeper.Tests
             var point =   new Vector2(-200.0006259982734f,  78.9606900388056f);
             const float tolerance = 1E-4f;
 
-            var line = new Line(tangent, point, tolerance);
+            var line = new AffineLine(tangent, point, tolerance);
 
-            var expected = new Line(1.4358974358974f, 366.141076087609f);
+            var expected = new AffineLine(1.4358974358974f, 366.141076087609f);
             
             AssertUtility.AreClose(line.m, expected.m, tolerance);
             AssertUtility.AreClose(line.b, expected.b, tolerance);

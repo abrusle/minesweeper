@@ -19,7 +19,7 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             drawMidLines = true;
 
         // debug
-        private List<Line> _lines = new ();
+        private List<BetterLine> _lines = new ();
         private List<IntersectionData> _intersectionPoints = new();
         private Vector3 _currentCellPoint;
 
@@ -88,12 +88,12 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
         private void BuildMeshData(Vector2Int centerCellCoords)
         {
             var points = pointPlacer.CurrentPoints;
-            if (!points.TryGetValue(centerCellCoords, out Vector3 pointPosition))
+            if (!points.TryGetValue(centerCellCoords, out Vector3 centerPoint))
             {
                 return;
             }
 
-            _currentCellPoint = pointPosition;
+            _currentCellPoint = centerPoint;
             
             _lines.Clear();
             Grid grid = pointPlacer.Grid;
@@ -108,13 +108,12 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
                 if (coords == centerCellCoords)
                     continue;
 
-                if (!points.TryGetValue(coords, out Vector3 position))
+                if (!points.TryGetValue(coords, out Vector3 cellPoint))
                     continue;
 
-                Vector3 midPoint = (pointPosition + position) * 0.5F;
-                Vector3 direction = (position - pointPosition).normalized;
-                Vector3 normal = Vector3.Cross(direction, gridForward);
-                var line = new Line(normal, midPoint);
+                Vector3 midPoint = (centerPoint + cellPoint) * 0.5F;
+                Vector3 direction = cellPoint - centerPoint;
+                var line = new BetterLine(direction, midPoint);
                 _lines.Add(line);
             }
 
@@ -135,11 +134,11 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
                         continue;
                     computedIndices.Add(indices);
 
-                    if (_lines[i].TryGetIntersection(_lines[j], out Vector2 intersection))
+                    if (BetterLine.TryGetIntersection( _lines[i], _lines[j], out Vector2 intersection))
                     {
-                        if (MathUtility.SqrDistance((Vector2) pointPosition, intersection) > maxSqrDistance)
+                        if (MathUtility.SqrDistance((Vector2) centerPoint, intersection) > maxSqrDistance)
                             continue;
-                        float angle = Vector2.SignedAngle(intersection - (Vector2)pointPosition, Vector2.right);
+                        float angle = Vector2.SignedAngle(intersection - (Vector2)centerPoint, Vector2.right);
                         _intersectionPoints.Add(new IntersectionData(i, j, intersection, angle));
                     }
                 }
@@ -150,17 +149,17 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
             {
                 bool remove = false;
                 IntersectionData intersection = _intersectionPoints[i];
-                var centerToIntersectionLine = Line.CreateFromPoints(pointPosition, intersection.position);
+                var centerToIntersectionLine = BetterLine.CreateFromPoints(centerPoint, intersection.position);
 
-                Vector2 min = Vector2.Min(pointPosition, intersection.position);
-                Vector2 max = Vector2.Max(pointPosition, intersection.position);
+                Vector2 min = Vector2.Min(centerPoint, intersection.position);
+                Vector2 max = Vector2.Max(centerPoint, intersection.position);
 
                 for (int l = 0, count = _lines.Count; l < count; l++)
                 {
                     if (l == intersection.lineIndexA || l == intersection.lineIndexB)
                         continue;
 
-                    if (!centerToIntersectionLine.TryGetIntersection(_lines[l], out Vector2 intersectionToCenter))
+                    if (!BetterLine.TryGetIntersection(in centerToIntersectionLine,_lines[l], out Vector2 intersectionToCenter))
                         continue;
                     
                     bool isOnSegment = intersectionToCenter.x >= min.x && intersectionToCenter.x <= max.x &&
@@ -234,19 +233,17 @@ namespace Minesweeper.Runtime.Experimental.Voronoi
 
         private void OnDrawGizmos()
         {
-            Vector2 cellSize = pointPlacer.Grid.cellSize + pointPlacer.Grid.cellGap;
-            
             if (drawMidLines)
             {
                 Gizmos.color = new Color(0.79f, 1f, 0.57f, 0.25f);
+                Vector2 max = pointPlacer.extents; // TODO account for cell size and grid position
+                Vector2 min = -max;
                 for (int i = 0, count = _lines.Count; i < count; i++)
                 {
-                    _lines[i].GetSegment(
-                        cellSize.x * -pointPlacer.extents.x,
-                        cellSize.x * pointPlacer.extents.x,
-                        out Vector2 start,
-                        out Vector2 end);
-                    Gizmos.DrawLine(start, end);
+                    if (_lines[i].TryGetSegment(min, max, out Vector2 start, out Vector2 end))
+                    {
+                        Gizmos.DrawLine(start, end);
+                    }
                 }
             }
             
